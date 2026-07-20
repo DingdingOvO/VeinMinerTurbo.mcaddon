@@ -1,0 +1,31 @@
+{
+    "name": "veinminer-addon",
+    "version": "0.3.2",
+    "description": "Minecraft Bedrock vein mining addon",
+    "type": "module",
+    "scripts": {
+        "build": "node build.mjs",
+        "pack": "node build.mjs",
+        "dev": "node build.mjs --watch",
+        "typecheck": "tsc -p tsconfig.json --noEmit",
+        "clean": "node build.mjs --clean"
+    },
+    "devDependencies": {
+        "@minecraft/common": "^1.2.0",
+        "@minecraft/server": "2.8.0",
+        "@minecraft/server-ui": "2.1.0",
+        "@types/node": "^22.0.0",
+        "esbuild": "^0.28.1",
+        "typescript": "^5.6.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "license": "MIT",
+    "overrides": {
+        "@minecraft/server": "2.8.0",
+        "@minecraft/server-ui": {
+            "@minecraft/server": "$@minecraft/server"
+        }
+    }
+}

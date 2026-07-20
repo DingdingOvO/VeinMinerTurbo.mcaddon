@@ -1,0 +1,34 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install & Build
+        env:
+          PACK_VERSION: ${{ github.ref_name }}
+        run: |
+          npm install
+          npm run build
+
+      - name: Upload Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: upload/VeinMiner-*.mcpack
+          name: VeinMiner ${{ github.ref_name }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') }}
