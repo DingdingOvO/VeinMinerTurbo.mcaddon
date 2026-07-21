@@ -5,11 +5,9 @@
  *   - 潜行 + 破坏方块 -> 连锁挖矿
  *   - 聊天 #vm       -> 打开设置
  *   - 聊天 #vm on/off -> 开关
- *   - 聊天 #vm reload -> 热重载
- *   - /scriptevent veinminer:toggle   -> 开关
- *   - /scriptevent veinminer:settings -> 设置
- *   - /scriptevent veinminer:reload   -> 热重载
- *   - /scriptevent veinminer:addblock  -> 添加注视方块到白名单
+ *   - /scriptevent vm:s -> 设置
+ *   - /scriptevent vm:t -> 开关
+ *   - /scriptevent vm:a -> 添加注视方块到白名单
  */
 
 import { world, system, Player, ScriptEventSource, ScriptEventCommandMessageAfterEvent } from '@minecraft/server';
@@ -30,7 +28,7 @@ registerVeinMiner();
 registerChatHandler();
 
 // ═══════════════════════════════════════
-//  scriptEvent 监听
+//  scriptEvent 监听 (vm: 短命名)
 // ═══════════════════════════════════════
 
 system.afterEvents.scriptEventReceive.subscribe(
@@ -42,19 +40,18 @@ system.afterEvents.scriptEventReceive.subscribe(
 
             const id = event.id;
 
-            if (id === 'veinminer:toggle') {
+            // vm:t = toggle
+            if (id === 'vm:t' || id === 'veinminer:toggle') {
                 const next = !getPlayerToggle(entity);
                 setPlayerToggle(entity, next);
                 entity.onScreenDisplay.setActionBar(
                     `§8[VM]§r ${next ? '§a连锁挖矿已开启' : '§c连锁挖矿已关闭'}`,
                 );
-            } else if (id === 'veinminer:settings') {
-                console.warn('[VM] 收到 settings 事件，打开设置...');
+            // vm:s = settings
+            } else if (id === 'vm:s' || id === 'veinminer:settings') {
                 showSettings(entity);
-            } else if (id === 'veinminer:reload') {
-                console.warn('[VM] 玩家请求重载配置');
-                entity.onScreenDisplay.setActionBar('§8[VM]§r §a配置已重载');
-            } else if (id === 'veinminer:addblock') {
+            // vm:a = add block
+            } else if (id === 'vm:a' || id === 'veinminer:addblock') {
                 const hit = entity.getBlockFromViewDirection({ maxDistance: 6 });
                 if (hit && hit.block) {
                     const added = addToWhitelist(entity, hit.block.typeId);
@@ -71,7 +68,7 @@ system.afterEvents.scriptEventReceive.subscribe(
             console.warn(`[VM] scriptEvent 错误: ${error}`);
         }
     },
-    { namespaces: ['veinminer'] },
+    { namespaces: ['vm', 'veinminer'] },
 );
 
 console.warn('[VM] 启动完成');
