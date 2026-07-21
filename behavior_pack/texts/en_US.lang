@@ -1,4 +1,24 @@
 ## VeinMiner - English Language File
 
+## ===== Pack Info =====
+pack.name=VeinMiner
+pack.description=Sneak+Mine vein mining. Type #vm for settings.
+
 ## ===== UI =====
-veinminer.ui.title=VeinMiner
+veinminer.ui.title=VeinMiner Settings
+veinminer.ui.toggle=Vein Mining
+veinminer.ui.max_vein=Max Range
+veinminer.ui.max_depth=Max Depth
+veinminer.ui.durability=Durability Guard
+veinminer.ui.durability.desc=Stop before tool breaks
+veinminer.ui.replant=Auto Replant
+veinminer.ui.replant.desc=Replant sapling after breaking
+veinminer.ui.collect_drops=Collect Drops
+veinminer.ui.collect_drops.desc=Teleport drops to break origin
+veinminer.ui.auto_leaves=Auto Leaves
+veinminer.ui.auto_leaves.desc=Break leaves when chopping trees
+veinminer.ui.whitelist=Whitelist
+veinminer.ui.whitelist.empty=(empty)
+veinminer.ui.whitelist.add=Add looked-at block
+veinminer.ui.whitelist.clear=Clear whitelist
+veinminer.ui.saved=Settings saved

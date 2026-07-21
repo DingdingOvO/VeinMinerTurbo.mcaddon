@@ -1,18 +1,11 @@
 /**
- * ChatHandler.ts -- Chat command handler
+ * ChatHandler.ts -- 聊天命令处理
  *
- * 2.8.0 stable doesn't have chatSend event, uses afterEvents.chatSend:
- *   - Can listen to chat messages
- *   - Cannot cancel (message shows in chat)
- *   - Use ActionBar for feedback
- *
- * If afterEvents.chatSend doesn't exist, silently skip.
- *
- * Commands:
- *   #vm        -> open settings
- *   #vm on     -> enable vein mining
- *   #vm off    -> disable vein mining
- *   #vm reload -> hot reload config
+ * 命令:
+ *   #vm        -> 打开设置
+ *   #vm on     -> 开启连锁挖矿
+ *   #vm off    -> 关闭连锁挖矿
+ *   #vm reload -> 热重载配置
  */
 
 import { world } from '@minecraft/server';
@@ -22,18 +15,12 @@ import {
 } from '../config';
 import { showSettings } from './VeinMinerUI';
 
-const TAG = '\u00a78[VM]\u00a7r';
-
-// ═══════════════════════════════════════
-//  Register
-// ═══════════════════════════════════════
-
 export function registerChatHandler(): void {
     const afterEvents = world.afterEvents as unknown as Record<string, { subscribe: (cb: (e: { message: string; sender: import('@minecraft/server').Player }) => void) => void }>;
     const chatSend = afterEvents['chatSend'];
 
     if (!chatSend) {
-        console.warn('[VM] chatSend event not available. Use /scriptevent veinminer:settings');
+        console.warn('[VM] chatSend 事件不可用，请使用 /scriptevent veinminer:settings');
         return;
     }
 
@@ -41,7 +28,7 @@ export function registerChatHandler(): void {
         try {
             handleChatCommand(event);
         } catch (error) {
-            console.warn(`[VM] Chat command error: ${error}`);
+            console.warn(`[VM] 聊天命令错误: ${error}`);
         }
     });
 }
@@ -57,16 +44,16 @@ function handleChatCommand(event: { message: string; sender: import('@minecraft/
         showSettings(sender);
     } else if (args === 'on') {
         setPlayerToggle(sender, true);
-        sender.onScreenDisplay.setActionBar(`${TAG} \u00a7aVein Mining ON`);
+        sender.onScreenDisplay.setActionBar('§8[VM]§r §a连锁挖矿已开启');
     } else if (args === 'off') {
         setPlayerToggle(sender, false);
-        sender.onScreenDisplay.setActionBar(`${TAG} \u00a7cVein Mining OFF`);
+        sender.onScreenDisplay.setActionBar('§8[VM]§r §c连锁挖矿已关闭');
     } else if (args === 'reload') {
-        console.warn('[VM] Config reload requested (chat)');
-        sender.onScreenDisplay.setActionBar(`${TAG} \u00a7aConfig reloaded`);
+        console.warn('[VM] 聊天请求重载配置');
+        sender.onScreenDisplay.setActionBar('§8[VM]§r §a配置已重载');
     } else {
         sender.onScreenDisplay.setActionBar(
-            `${TAG} \u00a77#vm \u00a7fsettings \u00a77| \u00a7f#vm on \u00a77| \u00a7f#vm off \u00a77| \u00a7f#vm reload`,
+            '§8[VM]§r §7#vm §f设置 §7| §f#vm on §7| §f#vm off §7| §f#vm reload',
         );
     }
 }

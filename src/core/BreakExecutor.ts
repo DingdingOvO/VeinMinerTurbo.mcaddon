@@ -153,7 +153,7 @@ function finishPlayer(pid: string, state: QueueState | undefined): void {
         try {
             const player = world.getPlayers().find(p => p.id === pid);
             if (player) {
-                player.onScreenDisplay.setActionBar(`${TAG} §a+${state.broken} 方块`);
+                player.onScreenDisplay.setActionBar(`${TAG} §a连锁破坏了 ${state.broken} 个方块`);
 
                 if (state.collectDrops && state.droppedItems.length > 0) {
                     collectDropsToOrigin(state.origin, state.droppedItems);

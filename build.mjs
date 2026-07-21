@@ -57,7 +57,7 @@ function packagePacks() {
         fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     }
 
-    const version = 'v0.3.2';
+    const version = 'v0.0.1';
     const name = `VeinMiner-${version}.mcpack`;
     const outPath = path.join(OUTPUT_DIR, name);
 

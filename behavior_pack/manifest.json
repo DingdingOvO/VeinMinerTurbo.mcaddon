@@ -4,7 +4,7 @@
         "name": "VeinMiner",
         "description": "Sneak+Mine vein mining. #vm for settings.",
         "uuid": "38fac878-f8ee-4f28-a010-620ba2a7c662",
-        "version": [0, 3, 2],
+        "version": [0, 0, 1],
         "min_engine_version": [1, 21, 0]
     },
     "modules": [
@@ -12,7 +12,7 @@
             "type": "script",
             "language": "javascript",
             "uuid": "65594d1d-506c-427c-93f8-447e6a7a44a9",
-            "version": [0, 3, 2],
+            "version": [0, 0, 1],
             "entry": "scripts/main.js"
         }
     ],

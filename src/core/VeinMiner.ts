@@ -66,7 +66,7 @@ function onBreakInner(event: PlayerBreakBlockBeforeEvent): void {
     const result = bfsScan(dimension, startLoc, typeId, maxVein, SCAN_TIMEOUT_MS, isLog);
 
     if (result.timedOut) {
-        player.onScreenDisplay.setActionBar(`${TAG} §e扫描超时`);
+        player.onScreenDisplay.setActionBar(`${TAG} §e连锁扫描超时，已破坏 ${result.blocks.length} 个方块`);
         return;
     }
 

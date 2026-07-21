@@ -1,1 +1,38 @@
-## VeinMiner - Traditional Chinese
+## VeinMiner - 繁體中文
+
+## ===== 套件資訊 =====
+pack.name=VeinMiner 連鎖挖礦
+pack.description=潛行+挖掘實現礦石/原木連鎖破壞。輸入 #vm 打開設定。
+
+## ===== UI =====
+veinminer.ui.title=VeinMiner 設定
+veinminer.ui.toggle=連鎖挖礦
+veinminer.ui.max_vein=最大連鎖數
+veinminer.ui.max_depth=最大搜尋深度
+veinminer.ui.durability=耐久保護
+veinminer.ui.durability.desc=工具快壞時自動停止
+veinminer.ui.replant=自動補種
+veinminer.ui.replant.desc=破壞後補回樹苗
+veinminer.ui.collect_drops=掉落物集中
+veinminer.ui.collect_drops.desc=傳送到挖掘起點
+veinminer.ui.auto_leaves=自動破葉
+veinminer.ui.auto_leaves.desc=砍樹時連帶破壞樹葉
+veinminer.ui.whitelist=白名單
+veinminer.ui.whitelist.empty=（空）
+veinminer.ui.whitelist.add=添加注視的方塊
+veinminer.ui.whitelist.clear=清空白名單
+veinminer.ui.saved=設定已儲存
+
+## ===== 提示 =====
+veinminer.tip.loaded=已載入
+veinminer.tip.sneak_mine=潛行+挖掘
+veinminer.tip.on=連鎖挖礦已開啟
+veinminer.tip.off=連鎖挖礦已關閉
+veinminer.tip.reloaded=設定已重載
+veinminer.tip.scan_timeout=連鎖掃描逾時
+veinminer.tip.broken=連鎖破壞了 %d 個方塊
+veinminer.tip.added=已添加
+veinminer.tip.already=已在白名單中
+veinminer.tip.not_looking=沒有注視任何方塊
+veinminer.tip.whitelist_cleared=白名單已清空
+veinminer.tip.settings_error=設定介面開啟失敗，請稍後重試

@@ -1,1 +1,38 @@
-## VeinMiner - Simplified Chinese
+## VeinMiner - 简体中文
+
+## ===== 包信息 =====
+pack.name=VeinMiner 连锁挖矿
+pack.description=潜行+挖掘实现矿石/原木连锁破坏。输入 #vm 打开设置。
+
+## ===== UI =====
+veinminer.ui.title=VeinMiner 设置
+veinminer.ui.toggle=连锁挖矿
+veinminer.ui.max_vein=最大连锁数
+veinminer.ui.max_depth=最大搜索深度
+veinminer.ui.durability=耐久保护
+veinminer.ui.durability.desc=工具快坏时自动停止
+veinminer.ui.replant=自动补种
+veinminer.ui.replant.desc=破坏后补回树苗
+veinminer.ui.collect_drops=掉落物集中
+veinminer.ui.collect_drops.desc=传送到挖掘起点
+veinminer.ui.auto_leaves=自动破叶
+veinminer.ui.auto_leaves.desc=砍树时连带破坏树叶
+veinminer.ui.whitelist=白名单
+veinminer.ui.whitelist.empty=（空）
+veinminer.ui.whitelist.add=添加注视的方块
+veinminer.ui.whitelist.clear=清空白名单
+veinminer.ui.saved=设置已保存
+
+## ===== 提示 =====
+veinminer.tip.loaded=已加载
+veinminer.tip.sneak_mine=潜行+挖掘
+veinminer.tip.on=连锁挖矿已开启
+veinminer.tip.off=连锁挖矿已关闭
+veinminer.tip.reloaded=配置已重载
+veinminer.tip.scan_timeout=连锁扫描超时
+veinminer.tip.broken=连锁破坏了 %d 个方块
+veinminer.tip.added=已添加
+veinminer.tip.already=已在白名单中
+veinminer.tip.not_looking=没有注视任何方块
+veinminer.tip.whitelist_cleared=白名单已清空
+veinminer.tip.settings_error=设置界面打开失败，请稍后重试

@@ -1,39 +1,32 @@
 /**
- * VeinMinerUI.ts -- DDUI Settings Form
+ * VeinMinerUI.ts -- 设置表单（ModalFormData）
  *
- * 3 Tabs: Basic / Whitelist / Advanced (OP)
- * Toggle off grays out all other controls
- * Always saves on close (including cancel)
+ * 使用 ModalFormData（老式表单 API），
+ * toggle/slider 接收普通 boolean/number，不依赖 Observable/DDUI。
+ *
+ * 触发: #vm / /scriptevent veinminer:settings
  */
 
 import { Player, system } from '@minecraft/server';
-import {
-    CustomForm,
-    ObservableBoolean,
-    ObservableNumber,
-    ObservableString,
-} from '@minecraft/server-ui';
+import { ModalFormData } from '@minecraft/server-ui';
 import {
     getPlayerToggle, setPlayerToggle,
     getPlayerMaxVein, setPlayerMaxVein,
     getPlayerAutoLeaves, setPlayerAutoLeaves,
     getPlayerCollectDrops, setPlayerCollectDrops,
-    SLIDER_MIN, SLIDER_MAX,
 } from '../config';
 import {
-    getWhitelist, addToWhitelist, clearWhitelist, formatWhitelist,
+    getWhitelist, clearWhitelist, formatWhitelist,
 } from './WhiteListManager';
 
 // ═══════════════════════════════════════
-//  Extra DynamicProperties (veinminer_ prefix)
+//  DynamicProperties (UI 专属)
 // ═══════════════════════════════════════
 
 const KEY_MAX_DEPTH = 'veinminer_max_depth';
 const KEY_DURABILITY = 'veinminer_durability';
 const KEY_REPLANT = 'veinminer_replant';
 
-const DEPTH_MIN = 1;
-const DEPTH_MAX = 32;
 const DEFAULT_MAX_DEPTH = 8;
 
 function getMaxDepth(p: Player): number {
@@ -41,171 +34,134 @@ function getMaxDepth(p: Player): number {
     return typeof v === 'number' ? v : DEFAULT_MAX_DEPTH;
 }
 
+function setMaxDepth(p: Player, v: number): void {
+    p.setDynamicProperty(KEY_MAX_DEPTH, v);
+}
+
 function getDurability(p: Player): boolean {
     return p.getDynamicProperty(KEY_DURABILITY) !== false;
+}
+
+function setDurability(p: Player, v: boolean): void {
+    p.setDynamicProperty(KEY_DURABILITY, v);
 }
 
 function getReplant(p: Player): boolean {
     return p.getDynamicProperty(KEY_REPLANT) === true;
 }
 
+function setReplant(p: Player, v: boolean): void {
+    p.setDynamicProperty(KEY_REPLANT, v);
+}
+
+function isOp(player: Player): boolean {
+    try {
+        return (player as unknown as { isOp: () => boolean }).isOp();
+    } catch {
+        return false;
+    }
+}
+
 // ═══════════════════════════════════════
-//  Main
+//  设置表单
 // ═══════════════════════════════════════
 
 export async function showSettings(player: Player): Promise<void> {
     try {
-        // -- Observables --
+        const op = isOp(player);
 
-        const mainToggle = new ObservableBoolean(
-            getPlayerToggle(player), { clientWritable: true },
-        );
+        // 读取当前设置
+        const toggle   = getPlayerToggle(player);
+        const maxVein  = getPlayerMaxVein(player);
+        const maxDepth = getMaxDepth(player);
+        const dur      = getDurability(player);
+        const repl     = getReplant(player);
+        const wlItems  = getWhitelist(player);
 
-        const isDisabled = new ObservableBoolean(!mainToggle.getData());
-        mainToggle.subscribe((val) => isDisabled.setData(!val));
-
-        // -- Tab switch --
-
-        const activeTab = new ObservableNumber(0);
-        const visBasic = new ObservableBoolean(true);
-        const visWhitelist = new ObservableBoolean(false);
-        const visAdvanced = new ObservableBoolean(false);
-
-        activeTab.subscribe((tab) => {
-            visBasic.setData(tab === 0);
-            visWhitelist.setData(tab === 1);
-            visAdvanced.setData(tab === 2);
-        });
-
-        // -- Basic Tab --
-
-        const maxVein = new ObservableNumber(
-            getPlayerMaxVein(player), { clientWritable: true },
-        );
-        const maxDepth = new ObservableNumber(
-            getMaxDepth(player), { clientWritable: true },
-        );
-        const durability = new ObservableBoolean(
-            getDurability(player), { clientWritable: true },
-        );
-        const replant = new ObservableBoolean(
-            getReplant(player), { clientWritable: true },
-        );
-
-        const maxVeinLabel = new ObservableString(
-            `Max Range: ${maxVein.getData()}`,
-        );
-        const maxDepthLabel = new ObservableString(
-            `Max Depth: ${maxDepth.getData()}`,
-        );
-        maxVein.subscribe((v) => maxVeinLabel.setData(`Max Range: ${v}`));
-        maxDepth.subscribe((v) => maxDepthLabel.setData(`Max Depth: ${v}`));
-
-        // -- Whitelist Tab --
-
-        const wlLabel = new ObservableString(
-            formatWhitelist(getWhitelist(player)),
-        );
-        let pendingAddBlock = false;
-
-        // -- Advanced Tab --
-
-        const autoLeaves = new ObservableBoolean(
-            getPlayerAutoLeaves(player), { clientWritable: true },
-        );
-        const collectDrops = new ObservableBoolean(
-            getPlayerCollectDrops(player), { clientWritable: true },
-        );
-
-        let isOp = false;
-        try { isOp = (player as unknown as { isOp: () => boolean }).isOp(); } catch { /* old version */ }
-
-        // -- Build form --
-
-        let form = new CustomForm(player, 'VeinMiner');
-
-        form = form.toggle('Vein Mining', mainToggle);
-        form = form.divider();
-
-        // Tab buttons
-        form = form.button('Basic', () => activeTab.setData(0), { disabled: isDisabled });
-        form = form.button('Whitelist', () => activeTab.setData(1), { disabled: isDisabled });
-        if (isOp) {
-            form = form.button('Advanced', () => activeTab.setData(2), { disabled: isDisabled });
+        let collect = false;
+        let leaves  = false;
+        if (op) {
+            collect = getPlayerCollectDrops(player);
+            leaves  = getPlayerAutoLeaves(player);
         }
 
-        form = form.divider();
+        // 构建表单
+        const form = new ModalFormData()
+            .title('VeinMiner 设置')
 
-        // -- Tab 1: Basic --
+            // 0: 连锁开关
+            .toggle('连锁挖矿', { defaultValue: toggle })
 
-        form = form.toggle('Durability Guard', durability, { visible: visBasic, disabled: isDisabled });
-        form = form.slider(maxVeinLabel, maxVein, SLIDER_MIN, SLIDER_MAX, {
-            step: 1, visible: visBasic, disabled: isDisabled,
-        });
-        form = form.slider(maxDepthLabel, maxDepth, DEPTH_MIN, DEPTH_MAX, {
-            step: 1, visible: visBasic, disabled: isDisabled,
-        });
-        form = form.toggle('Auto Replant', replant, { visible: visBasic, disabled: isDisabled });
+            // 1: 最大连锁数
+            .slider('最大连锁数', 1, 256, {
+                defaultValue: maxVein,
+                valueStep: 1,
+            })
 
-        // -- Tab 2: Whitelist --
+            // 2: 搜索深度
+            .slider('搜索深度', 1, 32, {
+                defaultValue: maxDepth,
+                valueStep: 1,
+            })
 
-        form = form.header('Custom Whitelist', { visible: visWhitelist });
-        form = form.label(wlLabel, { visible: visWhitelist });
-        form = form.button('Add Block', () => {
-            pendingAddBlock = true;
-            form.close();
-        }, { visible: visWhitelist, disabled: isDisabled });
-        form = form.button('Clear Whitelist', () => {
-            clearWhitelist(player);
-            wlLabel.setData('(empty)');
-        }, { visible: visWhitelist, disabled: isDisabled });
+            // 3: 耐久保护
+            .toggle('耐久保护 (工具快坏时停止)', { defaultValue: dur })
 
-        // -- Tab 3: Advanced (OP only) --
+            // 4: 自动补种
+            .toggle('自动补种 (破坏后补回树苗)', { defaultValue: repl });
 
-        if (isOp) {
-            form = form.toggle('Collect Drops', collectDrops, { visible: visAdvanced, disabled: isDisabled });
-            form = form.toggle('Auto Leaves', autoLeaves, { visible: visAdvanced, disabled: isDisabled });
-        }
-
-        form = form.closeButton();
-
-        // -- Show & save --
-
-        await form.show();
-
-        // Always save (Observable holds latest values)
-        setPlayerToggle(player, mainToggle.getData());
-        setPlayerMaxVein(player, maxVein.getData());
-        player.setDynamicProperty(KEY_MAX_DEPTH, maxDepth.getData());
-        player.setDynamicProperty(KEY_DURABILITY, durability.getData());
-        player.setDynamicProperty(KEY_REPLANT, replant.getData());
-
-        if (isOp) {
-            setPlayerAutoLeaves(player, autoLeaves.getData());
-            setPlayerCollectDrops(player, collectDrops.getData());
-        }
-
-        // Add block flow: close form -> next tick get block from view -> add -> reopen
-        if (pendingAddBlock) {
-            system.run(() => {
-                const hit = player.getBlockFromViewDirection({ maxDistance: 6 });
-                if (hit && hit.block) {
-                    const added = addToWhitelist(player, hit.block.typeId);
-                    if (added) {
-                        player.onScreenDisplay.setActionBar(`[VM] Added ${hit.block.typeId}`);
-                    } else {
-                        player.onScreenDisplay.setActionBar(`[VM] ${hit.block.typeId} already in whitelist`);
-                    }
-                } else {
-                    player.onScreenDisplay.setActionBar('[VM] Not looking at any block');
-                }
-                // Reopen settings
-                showSettings(player);
-            });
+        // 5: 白名单标签
+        if (wlItems.length === 0) {
+            form.label('白名单: (空)');
         } else {
-            player.onScreenDisplay.setActionBar('[VM] Settings saved');
+            form.label('白名单: ' + formatWhitelist(wlItems));
         }
+
+        // 6: 清空白名单
+        form.toggle('清空白名单', { defaultValue: false });
+
+        if (op) {
+            // 7: 掉落物集中
+            form.toggle('掉落物集中 (传送到挖掘起点)', { defaultValue: collect })
+            // 8: 自动破叶
+            .toggle('自动破叶 (砍树时连带树叶)', { defaultValue: leaves });
+        }
+
+        // ── 显示 ──
+
+        const response = await form.show(player);
+
+        if (response.canceled) {
+            if (response.cancelationReason === 'UserBusy') {
+                system.runTimeout(() => showSettings(player), 10);
+            }
+            return;
+        }
+
+        const v = response.formValues;
+        if (!v) return;
+
+        // ── 保存 ──
+
+        setPlayerToggle(player, v[0] as boolean);
+        setPlayerMaxVein(player, v[1] as number);
+        setMaxDepth(player, v[2] as number);
+        setDurability(player, v[3] as boolean);
+        setReplant(player, v[4] as boolean);
+
+        // v[5] 是 label，跳过
+        if (v[6] as boolean) {
+            clearWhitelist(player);
+        }
+
+        if (op) {
+            setPlayerCollectDrops(player, v[7] as boolean);
+            setPlayerAutoLeaves(player, v[8] as boolean);
+        }
+
+        player.sendMessage('§8[VM] §a设置已保存');
     } catch (error) {
-        console.warn('[VM] Settings form failed', error);
+        console.warn(`[VM] 设置表单出错: ${error}`);
+        player.sendMessage('§8[VM] §c设置界面出错: ' + error);
     }
 }

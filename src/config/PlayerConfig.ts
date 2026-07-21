@@ -48,10 +48,10 @@ export function setPlayerMaxVein(p: Player, v: number): void {
 //  自动破叶
 // ═══════════════════════════════════════
 
-/** 获取自动破叶开关，默认关闭 */
+/** 获取自动破叶开关，默认开启 */
 export function getPlayerAutoLeaves(p: Player): boolean {
     const v = p.getDynamicProperty(KEY_AUTO_LEAVES);
-    return v === true;
+    return v !== false;
 }
 
 export function setPlayerAutoLeaves(p: Player, v: boolean): void {
