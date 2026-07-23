@@ -19,7 +19,8 @@ const BP_DIR = path.join(ROOT, 'behavior_pack');
 const RP_DIR = path.join(ROOT, 'resource_pack');
 const ENTRY = path.join(ROOT, 'src', 'main.ts');
 const OUTPUT_DIR = path.join(ROOT, 'upload');
-const VERSION = 'v0.0.1';
+const DOWNLOAD_DIR = '/home/z/my-project/download';
+const VERSION = 'v0.0.2';
 
 // ═══════════════════════════════════════
 //  esbuild
@@ -85,6 +86,12 @@ function packagePacks() {
     );
     const kb = (fs.statSync(mcaddon).size / 1024).toFixed(1);
     console.log(`  ${path.basename(mcaddon)} (${kb} KB)`);
+
+    // Copy mcaddon to download directory
+    if (!fs.existsSync(DOWNLOAD_DIR)) fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
+    const dlFile = path.join(DOWNLOAD_DIR, `VeinMiner-${VERSION}.mcaddon`);
+    fs.copyFileSync(mcaddon, dlFile);
+    console.log(`  Copied to ${dlFile}`);
 }
 
 // ═══════════════════════════════════════

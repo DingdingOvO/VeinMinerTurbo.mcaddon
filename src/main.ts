@@ -22,7 +22,7 @@ import { addToWhitelist } from './ui/WhiteListManager';
 //  启动
 // ═══════════════════════════════════════
 
-console.warn('[VM] VeinMiner v0.0.1 启动中...');
+console.warn('[VM] VeinMiner v0.0.2 启动中...');
 
 registerVeinMiner();
 registerChatHandler();
