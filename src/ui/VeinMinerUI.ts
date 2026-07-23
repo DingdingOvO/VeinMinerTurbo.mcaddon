@@ -18,6 +18,7 @@ import {
 import {
     getWhitelist, clearWhitelist, formatWhitelist,
 } from './WhiteListManager';
+import { syncHud } from '../main';
 
 // ═══════════════════════════════════════
 //  DynamicProperties (UI 专属)
@@ -144,6 +145,7 @@ export async function showSettings(player: Player): Promise<void> {
         // ── 保存 ──
 
         setPlayerToggle(player, v[0] as boolean);
+        syncHud(player, v[0] as boolean);
         setPlayerMaxVein(player, v[1] as number);
         setMaxDepth(player, v[2] as number);
         setDurability(player, v[3] as boolean);

@@ -19,8 +19,13 @@ import { CHAT_PREFIX } from './config';
 import { addToWhitelist } from './ui/WhiteListManager';
 
 // ═══════════════════════════════════════
-//  启动
+//  HUD 同步：通过 title 文本驱动 JSON UI 绑定
 // ═══════════════════════════════════════
+
+/** 向 HUD 推送开关状态。title 文本 'vm:1' / 'vm:0' 会被 JSON UI 绑定读取 */
+export function syncHud(player: Player, enabled: boolean): void {
+    player.runCommandAsync(`title @s title ${enabled ? 'vm:1' : 'vm:0'}`);
+}
 
 console.warn('[VM] VeinMiner v0.0.2 启动中...');
 
@@ -44,6 +49,7 @@ system.afterEvents.scriptEventReceive.subscribe(
             if (id === 'vm:t' || id === 'veinminer:toggle') {
                 const next = !getPlayerToggle(entity);
                 setPlayerToggle(entity, next);
+                syncHud(entity, next);
                 entity.onScreenDisplay.setActionBar(
                     `§8[VM]§r ${next ? '§a连锁挖矿已开启' : '§c连锁挖矿已关闭'}`,
                 );
@@ -75,8 +81,18 @@ console.warn('[VM] 启动完成');
 
 system.run(() => {
     for (const player of world.getAllPlayers()) {
+        syncHud(player, getPlayerToggle(player));
         player.onScreenDisplay.setActionBar(
             `§8[VM]§r §a已加载 §7| §f潜行+挖掘 §7| §f${CHAT_PREFIX} 设置`,
         );
+    }
+});
+
+// 玩家首次进入世界时同步 HUD
+world.afterEvents.playerSpawn.subscribe((ev) => {
+    if (ev.initialSpawn) {
+        system.run(() => {
+            syncHud(ev.player, getPlayerToggle(ev.player));
+        });
     }
 });

@@ -14,6 +14,7 @@ import {
     CHAT_PREFIX,
 } from '../config';
 import { showSettings } from './VeinMinerUI';
+import { syncHud } from '../main';
 
 export function registerChatHandler(): void {
     // chatSend 在 beforeEvents 上（可 cancel 消息）
@@ -40,9 +41,11 @@ export function registerChatHandler(): void {
                 showSettings(sender);
             } else if (args === 'on') {
                 setPlayerToggle(sender, true);
+                syncHud(sender, true);
                 sender.onScreenDisplay.setActionBar('§8[VM]§r §a连锁挖矿已开启');
             } else if (args === 'off') {
                 setPlayerToggle(sender, false);
+                syncHud(sender, false);
                 sender.onScreenDisplay.setActionBar('§8[VM]§r §c连锁挖矿已关闭');
             } else if (args === 'reload') {
                 console.warn('[VM] 聊天请求重载配置');
