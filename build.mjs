@@ -1,8 +1,10 @@
 /**
- * build.mjs -- VeinMiner Build Script (BP only)
+ * build.mjs -- VeinMiner Build Script (BP + RP)
  *
  * src/*.ts  --esbuild bundle-->  behavior_pack/scripts/main.js
- * behavior_pack/  --zip-->  VeinMiner.mcpack
+ * behavior_pack/  --zip-->  VeinMiner-BP-v0.0.1.mcpack
+ * resource_pack/  --zip-->  VeinMiner-RP-v0.0.1.mcpack
+ * both mcpacks  --zip-->  VeinMiner-v0.0.1.mcaddon
  */
 
 import fs from 'fs';
@@ -13,17 +15,18 @@ import { build as esbuild } from 'esbuild';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
-
 const BP_DIR = path.join(ROOT, 'behavior_pack');
+const RP_DIR = path.join(ROOT, 'resource_pack');
 const ENTRY = path.join(ROOT, 'src', 'main.ts');
 const OUTPUT_DIR = path.join(ROOT, 'upload');
+const VERSION = 'v0.0.1';
 
 // ═══════════════════════════════════════
 //  esbuild
 // ═══════════════════════════════════════
 
 async function bundle() {
-    console.log('  Bundling...');
+    console.log('  Bundling TypeScript...');
 
     const outDir = path.join(BP_DIR, 'scripts');
     if (fs.existsSync(outDir)) {
@@ -52,19 +55,36 @@ async function bundle() {
 //  Package
 // ═══════════════════════════════════════
 
+function zipPack(dir, outFile) {
+    if (fs.existsSync(outFile)) fs.unlinkSync(outFile);
+    execSync(`cd "${dir}" && zip -r "${outFile}" . -x "*.DS_Store"`, { stdio: 'pipe' });
+    const kb = (fs.statSync(outFile).size / 1024).toFixed(1);
+    console.log(`  ${path.basename(outFile)} (${kb} KB)`);
+}
+
 function packagePacks() {
     if (!fs.existsSync(OUTPUT_DIR)) {
         fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     }
 
-    const version = 'v0.0.1';
-    const name = `VeinMiner-${version}.mcpack`;
-    const outPath = path.join(OUTPUT_DIR, name);
+    const bpPack = path.join(OUTPUT_DIR, `VeinMiner-BP-${VERSION}.mcpack`);
+    const rpPack = path.join(OUTPUT_DIR, `VeinMiner-RP-${VERSION}.mcpack`);
+    const mcaddon = path.join(OUTPUT_DIR, `VeinMiner-${VERSION}.mcaddon`);
 
-    if (fs.existsSync(outPath)) fs.unlinkSync(outPath);
+    console.log('  Packaging BP...');
+    zipPack(BP_DIR, bpPack);
 
-    execSync(`cd "${BP_DIR}" && zip -r "${outPath}" .`, { stdio: 'pipe' });
-    console.log(`  ${name} (${(fs.statSync(outPath).size / 1024).toFixed(1)} KB)`);
+    console.log('  Packaging RP...');
+    zipPack(RP_DIR, rpPack);
+
+    console.log('  Creating .mcaddon...');
+    if (fs.existsSync(mcaddon)) fs.unlinkSync(mcaddon);
+    execSync(
+        `cd "${OUTPUT_DIR}" && zip "${mcaddon}" "${path.basename(bpPack)}" "${path.basename(rpPack)}"`,
+        { stdio: 'pipe' }
+    );
+    const kb = (fs.statSync(mcaddon).size / 1024).toFixed(1);
+    console.log(`  ${path.basename(mcaddon)} (${kb} KB)`);
 }
 
 // ═══════════════════════════════════════
@@ -82,7 +102,7 @@ if (args.includes('--clean')) {
     process.exit(0);
 }
 
-console.log('\n=== VeinMiner Build ===\n');
+console.log(`\n=== VeinMiner Build ${VERSION} ===\n`);
 
 await bundle();
 packagePacks();
