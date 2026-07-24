@@ -9,7 +9,6 @@ export { BLACKLIST_IDS } from './blocks/Blacklist';
 export {
     DEFAULT_MAX_VEIN, SLIDER_MIN, SLIDER_MAX,
     SCAN_TIMEOUT_MS, LEAF_SCAN_RADIUS, LEAF_MAX_COUNT,
-    CHAT_PREFIX,
 } from './Constants';
 export {
     getPlayerToggle, setPlayerToggle,

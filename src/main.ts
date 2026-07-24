@@ -13,7 +13,7 @@ import { registerVeinMiner } from './core';
 import { showSettings } from './ui/VeinMinerUI';
 import { getPlayerToggle, setPlayerToggle } from './config';
 import { addToWhitelist } from './ui/WhiteListManager';
-import { t, tf1, tagged, taggedf1, rawtext, TAG } from './utils/LangHelper';
+import { t, tf1, tagged, rawtext, TAG } from './utils/LangHelper';
 
 // ═══════════════════════════════════════
 //  HUD 同步：通过 title 文本驱动 JSON UI 绑定

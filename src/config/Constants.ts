@@ -18,5 +18,4 @@ export const LEAF_SCAN_RADIUS = 4;
 /** 树叶最大扫描数量 */
 export const LEAF_MAX_COUNT = 64;
 
-/** 聊天命令前缀 */
-export const CHAT_PREFIX = '#vm';
+// CHAT_PREFIX removed — chat commands replaced by /scriptevent

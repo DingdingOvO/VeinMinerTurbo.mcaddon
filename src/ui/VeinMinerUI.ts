@@ -19,7 +19,7 @@ import {
     getWhitelist, clearWhitelist, formatWhitelist,
 } from './WhiteListManager';
 import { syncHud } from '../main';
-import { t, tf1, tagged, rawtext, TAG } from '../utils/LangHelper';
+import { t, tf1, tagged } from '../utils/LangHelper';
 
 // ═══════════════════════════════════════
 //  DynamicProperties (UI 专属)
@@ -164,7 +164,7 @@ export async function showSettings(player: Player): Promise<void> {
 
         player.sendMessage(tagged('veinminer.ui.saved'));
     } catch (error) {
-        console.warn(`[VMT] 设置表单出错: ${error}`);
+        console.warn(`[VMT] settings form error: ${error}`);
         player.sendMessage(tagged('veinminer.tip.settings_error'));
     }
 }
