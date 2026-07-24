@@ -6,8 +6,6 @@
         "anchor_from": "top_right",
         "anchor_to": "top_right",
         "size": [64, 28],
-        "clip": false,
-        "layer": 100,
         "controls": [
             { "vm_bg@vm.vm_bg": {} },
             { "vm_row@vm.vm_row": {} }
@@ -20,9 +18,8 @@
         "size": [60, 22],
         "anchor_from": "center",
         "anchor_to": "center",
-        "alpha": 0.35,
-        "color": [0, 0, 0],
-        "layer": 0
+        "alpha": 0.5,
+        "color": [0, 0, 0]
     },
 
     "vm_row": {
@@ -31,7 +28,6 @@
         "anchor_from": "top_right",
         "anchor_to": "top_right",
         "offset": [-6, 6],
-        "layer": 1,
         "controls": [
             { "vm_gear@vm.vm_gear_btn": {} },
             { "vm_sep@vm.vm_sep_img": {} },
@@ -45,8 +41,8 @@
         "texture": "textures/ui/icon_setting",
         "size": [20, 20],
         "offset": [0, 1],
-        "color": [0.7, 0.7, 0.7],
-        "hover_color": [0.9, 0.9, 0.9],
+        "color": [0.8, 0.8, 0.8],
+        "hover_color": [1.0, 1.0, 1.0],
         "pressed_color": [0.5, 0.5, 0.5],
         "focus_enabled": true,
         "button_mappings": [
@@ -63,7 +59,7 @@
         "texture": "textures/ui/White",
         "size": [1, 14],
         "color": [0.5, 0.5, 0.5],
-        "alpha": 0.4
+        "alpha": 0.5
     },
 
     "vm_toggle_on_btn": {
@@ -72,7 +68,7 @@
         "size": [24, 14],
         "offset": [0, 5],
         "color": [0.3, 1.0, 0.3],
-        "hover_color": [0.4, 1.0, 0.4],
+        "hover_color": [0.5, 1.0, 0.5],
         "pressed_color": [0.2, 0.8, 0.2],
         "visible": false,
         "focus_enabled": true,
@@ -102,8 +98,8 @@
         "size": [24, 14],
         "offset": [0, 5],
         "color": [0.5, 0.5, 0.5],
-        "hover_color": [0.6, 0.6, 0.6],
-        "pressed_color": [0.4, 0.4, 0.4],
+        "hover_color": [0.7, 0.7, 0.7],
+        "pressed_color": [0.3, 0.3, 0.3],
         "visible": true,
         "focus_enabled": true,
         "button_mappings": [
@@ -126,6 +122,18 @@
         ]
     },
 
+    "root_panel": {
+        "modifications": [
+            {
+                "array_name": "controls",
+                "operation": "insert_front",
+                "value": [
+                    { "vm_hud@vm.vm_hud_panel": {} }
+                ]
+            }
+        ]
+    },
+
     "hud_screen": {
         "button_press_handlers": [
             {
@@ -137,16 +145,5 @@
                 "commands": ["/scriptevent vm:t"]
             }
         ]
-    },
-
-    "root_panel": {
-        "modifications": [
-            {
-                "array_name": "controls",
-                "operation": "insert_front",
-                "value": [
-                    { "vm_hud@vm.vm_hud_panel": {} }
-                ]
-            }
-        ]
-    }\n}
+    }
+}
