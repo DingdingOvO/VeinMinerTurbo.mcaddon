@@ -60,6 +60,6 @@ export function clearWhitelist(player: Player): void {
 // ═══════════════════════════════════════
 
 export function formatWhitelist(items: string[]): string {
-    if (items.length === 0) return '(空)';
+    if (items.length === 0) return '';
     return items.map(id => id.replace(/^minecraft:/, '')).join(', ');
 }

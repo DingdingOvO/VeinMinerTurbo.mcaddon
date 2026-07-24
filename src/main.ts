@@ -1,22 +1,19 @@
 /**
- * main.ts -- VeinMiner Behavior Pack Entry
+ * main.ts -- VeinMinerTurbo Behavior Pack Entry
  *
  * 触发方式:
  *   - 潜行 + 破坏方块 -> 连锁挖矿
- *   - 聊天 #vm       -> 打开设置
- *   - 聊天 #vm on/off -> 开关
- *   - /scriptevent vm:s -> 设置
+ *   - /scriptevent vm:s -> 打开设置
  *   - /scriptevent vm:t -> 开关
  *   - /scriptevent vm:a -> 添加注视方块到白名单
  */
 
 import { world, system, Player, ScriptEventSource, ScriptEventCommandMessageAfterEvent } from '@minecraft/server';
 import { registerVeinMiner } from './core';
-import { registerChatHandler } from './ui/ChatHandler';
 import { showSettings } from './ui/VeinMinerUI';
 import { getPlayerToggle, setPlayerToggle } from './config';
-import { CHAT_PREFIX } from './config';
 import { addToWhitelist } from './ui/WhiteListManager';
+import { t, tf1, tagged, taggedf1, rawtext, TAG } from './utils/LangHelper';
 
 // ═══════════════════════════════════════
 //  HUD 同步：通过 title 文本驱动 JSON UI 绑定
@@ -24,13 +21,10 @@ import { addToWhitelist } from './ui/WhiteListManager';
 
 /** 向 HUD 推送开关状态。title 文本 'vm:1' / 'vm:0' 会被 JSON UI 绑定读取 */
 export function syncHud(player: Player, enabled: boolean): void {
-    player.runCommandAsync(`title @s title ${enabled ? 'vm:1' : 'vm:0'}`);
+    player.runCommand(`title @s title ${enabled ? 'vm:1' : 'vm:0'}`);
 }
 
-console.warn('[VM] VeinMiner v0.0.2 启动中...');
-
 registerVeinMiner();
-registerChatHandler();
 
 // ═══════════════════════════════════════
 //  scriptEvent 监听 (vm: 短命名)
@@ -51,7 +45,7 @@ system.afterEvents.scriptEventReceive.subscribe(
                 setPlayerToggle(entity, next);
                 syncHud(entity, next);
                 entity.onScreenDisplay.setActionBar(
-                    `§8[VM]§r ${next ? '§a连锁挖矿已开启' : '§c连锁挖矿已关闭'}`,
+                    [rawtext(TAG + ' '), t(next ? 'veinminer.tip.on' : 'veinminer.tip.off')],
                 );
             // vm:s = settings
             } else if (id === 'vm:s' || id === 'veinminer:settings') {
@@ -61,29 +55,28 @@ system.afterEvents.scriptEventReceive.subscribe(
                 const hit = entity.getBlockFromViewDirection({ maxDistance: 6 });
                 if (hit && hit.block) {
                     const added = addToWhitelist(entity, hit.block.typeId);
+                    const blockName = hit.block.typeId.replace(/^minecraft:/, '');
                     entity.sendMessage(
                         added
-                            ? `§8[VM] §a已添加 §f${hit.block.typeId.replace(/^minecraft:/, '')}`
-                            : `§8[VM] §c${hit.block.typeId.replace(/^minecraft:/, '')} 已在白名单中`,
+                            ? [rawtext(TAG + ' §a'), tf1('veinminer.tip.added', '§f' + blockName)]
+                            : [rawtext(TAG + ' §c' + blockName + ' '), t('veinminer.tip.already')],
                     );
                 } else {
-                    entity.sendMessage('§8[VM] §c没有注视任何方块');
+                    entity.sendMessage(tagged('veinminer.tip.not_looking'));
                 }
             }
         } catch (error) {
-            console.warn(`[VM] scriptEvent 错误: ${error}`);
+            console.warn(`[VMT] scriptevent error: ${error}`);
         }
     },
     { namespaces: ['vm', 'veinminer'] },
 );
 
-console.warn('[VM] 启动完成');
-
 system.run(() => {
     for (const player of world.getAllPlayers()) {
         syncHud(player, getPlayerToggle(player));
         player.onScreenDisplay.setActionBar(
-            `§8[VM]§r §a已加载 §7| §f潜行+挖掘 §7| §f${CHAT_PREFIX} 设置`,
+            [rawtext(TAG + ' §a'), t('veinminer.tip.loaded'), rawtext(' §7| §f'), t('veinminer.tip.sneak_mine')],
         );
     }
 });

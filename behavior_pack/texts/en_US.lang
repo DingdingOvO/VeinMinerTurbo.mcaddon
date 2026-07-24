@@ -1,24 +1,45 @@
-## VeinMiner - English Language File
+## VeinMinerTurbo - English Language File
 
 ## ===== Pack Info =====
-pack.name=VeinMiner
-pack.description=Sneak+Mine vein mining. Type #vm for settings.
+pack.name=VeinMinerTurbo
+pack.description=Sneak+Mine vein mining. /scriptevent vm:s for settings.
 
 ## ===== UI =====
-veinminer.ui.title=VeinMiner Settings
+veinminer.ui.title=VeinMinerTurbo Settings
 veinminer.ui.toggle=Vein Mining
 veinminer.ui.max_vein=Max Range
 veinminer.ui.max_depth=Max Depth
 veinminer.ui.durability=Durability Guard
 veinminer.ui.durability.desc=Stop before tool breaks
+veinminer.ui.durability_full=Durability Guard (stop before tool breaks)
 veinminer.ui.replant=Auto Replant
 veinminer.ui.replant.desc=Replant sapling after breaking
+veinminer.ui.replant_full=Auto Replant (replant sapling after breaking)
 veinminer.ui.collect_drops=Collect Drops
 veinminer.ui.collect_drops.desc=Teleport drops to break origin
+veinminer.ui.collect_drops_full=Collect Drops (teleport to break origin)
 veinminer.ui.auto_leaves=Auto Leaves
 veinminer.ui.auto_leaves.desc=Break leaves when chopping trees
+veinminer.ui.auto_leaves_full=Auto Leaves (break leaves when chopping trees)
 veinminer.ui.whitelist=Whitelist
 veinminer.ui.whitelist.empty=(empty)
 veinminer.ui.whitelist.add=Add looked-at block
 veinminer.ui.whitelist.clear=Clear whitelist
+veinminer.ui.whitelist_label=Whitelist: %s
+veinminer.ui.whitelist_label_empty=Whitelist: (empty)
 veinminer.ui.saved=Settings saved
+
+## ===== Tips =====
+veinminer.tip.loaded=Loaded
+veinminer.tip.sneak_mine=Sneak+Mine
+veinminer.tip.on=Vein mining enabled
+veinminer.tip.off=Vein mining disabled
+veinminer.tip.reloaded=Config reloaded
+veinminer.tip.scan_timeout=Scan timed out
+veinminer.tip.scan_timeout_full=Scan timed out, broke %s blocks
+veinminer.tip.broken=Chain-broke %s blocks
+veinminer.tip.added=Added %s
+veinminer.tip.already=already in whitelist
+veinminer.tip.not_looking=Not looking at any block
+veinminer.tip.whitelist_cleared=Whitelist cleared
+veinminer.tip.settings_error=Failed to open settings, please try again later

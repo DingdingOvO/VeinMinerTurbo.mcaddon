@@ -79,7 +79,7 @@ export function bfsScan(
 
     while (queue.length > 0) {
         if (++iterations > MAX_BFS_ITERATIONS) {
-            console.warn(`[VM] BFS 达到迭代上限 (${MAX_BFS_ITERATIONS})，已收集 ${result.length} 个方块`);
+            console.warn(`[VMT] BFS 达到迭代上限 (${MAX_BFS_ITERATIONS})，已收集 ${result.length} 个方块`);
             return { blocks: result, timedOut: false };
         }
         if (Date.now() - t0 > timeoutMs) return { blocks: result, timedOut: true };

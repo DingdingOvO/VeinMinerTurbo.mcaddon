@@ -1,10 +1,10 @@
 /**
- * build.mjs -- VeinMiner Build Script (BP + RP)
+ * build.mjs -- VeinMinerTurbo Build Script (BP + RP)
  *
  * src/*.ts  --esbuild bundle-->  behavior_pack/scripts/main.js
- * behavior_pack/  --zip-->  VeinMiner-BP-v0.0.1.mcpack
- * resource_pack/  --zip-->  VeinMiner-RP-v0.0.1.mcpack
- * both mcpacks  --zip-->  VeinMiner-v0.0.1.mcaddon
+ * behavior_pack/  --zip-->  VeinMinerTurbo-BP-v0.0.3.mcpack
+ * resource_pack/  --zip-->  VeinMinerTurbo-RP-v0.0.3.mcpack
+ * both mcpacks  --zip-->  VeinMinerTurbo-v0.0.3.mcaddon
  */
 
 import fs from 'fs';
@@ -20,7 +20,7 @@ const RP_DIR = path.join(ROOT, 'resource_pack');
 const ENTRY = path.join(ROOT, 'src', 'main.ts');
 const OUTPUT_DIR = path.join(ROOT, 'upload');
 const DOWNLOAD_DIR = '/home/z/my-project/download';
-const VERSION = 'v0.0.2';
+const VERSION = 'v0.0.3';
 
 // ═══════════════════════════════════════
 //  esbuild
@@ -68,9 +68,9 @@ function packagePacks() {
         fs.mkdirSync(OUTPUT_DIR, { recursive: true });
     }
 
-    const bpPack = path.join(OUTPUT_DIR, `VeinMiner-BP-${VERSION}.mcpack`);
-    const rpPack = path.join(OUTPUT_DIR, `VeinMiner-RP-${VERSION}.mcpack`);
-    const mcaddon = path.join(OUTPUT_DIR, `VeinMiner-${VERSION}.mcaddon`);
+    const bpPack = path.join(OUTPUT_DIR, `VeinMinerTurbo-BP-${VERSION}.mcpack`);
+    const rpPack = path.join(OUTPUT_DIR, `VeinMinerTurbo-RP-${VERSION}.mcpack`);
+    const mcaddon = path.join(OUTPUT_DIR, `VeinMinerTurbo-${VERSION}.mcaddon`);
 
     console.log('  Packaging BP...');
     zipPack(BP_DIR, bpPack);
@@ -89,7 +89,7 @@ function packagePacks() {
 
     // Copy mcaddon to download directory
     if (!fs.existsSync(DOWNLOAD_DIR)) fs.mkdirSync(DOWNLOAD_DIR, { recursive: true });
-    const dlFile = path.join(DOWNLOAD_DIR, `VeinMiner-${VERSION}.mcaddon`);
+    const dlFile = path.join(DOWNLOAD_DIR, `VeinMinerTurbo-${VERSION}.mcaddon`);
     fs.copyFileSync(mcaddon, dlFile);
     console.log(`  Copied to ${dlFile}`);
 }
@@ -109,7 +109,7 @@ if (args.includes('--clean')) {
     process.exit(0);
 }
 
-console.log(`\n=== VeinMiner Build ${VERSION} ===\n`);
+console.log(`\n=== VeinMinerTurbo Build ${VERSION} ===\n`);
 
 await bundle();
 packagePacks();

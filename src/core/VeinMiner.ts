@@ -14,8 +14,7 @@ import {
     getPlayerToggle, getPlayerMaxVein, getPlayerAutoLeaves, getPlayerCollectDrops,
     SCAN_TIMEOUT_MS,
 } from '../config';
-
-const TAG = '§8[VM]§r';
+import { tf1, rawtext, TAG } from '../utils/LangHelper';
 
 // ═══════════════════════════════════════
 //  注册
@@ -33,7 +32,7 @@ function onBreak(event: PlayerBreakBlockBeforeEvent): void {
     try {
         onBreakInner(event);
     } catch (error) {
-        console.warn(`[VM] 方块破坏事件处理失败: ${error}`);
+        console.warn(`[VMT] block event error: ${error}`);
     }
 }
 
@@ -66,7 +65,7 @@ function onBreakInner(event: PlayerBreakBlockBeforeEvent): void {
     const result = bfsScan(dimension, startLoc, typeId, maxVein, SCAN_TIMEOUT_MS, isLog);
 
     if (result.timedOut) {
-        player.onScreenDisplay.setActionBar(`${TAG} §e连锁扫描超时，已破坏 ${result.blocks.length} 个方块`);
+        player.onScreenDisplay.setActionBar([rawtext(TAG + ' §e'), tf1('veinminer.tip.scan_timeout_full', String(result.blocks.length))]);
         return;
     }
 

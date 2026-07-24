@@ -15,8 +15,7 @@
 import { world, system, Player, Dimension, Vector3, Entity } from '@minecraft/server';
 import { Pos, sortByDistance } from './Scanner';
 import { getDrops, getExperience, spawnDrops } from '../utils/EnchantmentHelper';
-
-const TAG = '§8[VM]§r';
+import { tf1, rawtext, TAG } from '../utils/LangHelper';
 const BATCH_SIZE = 20;
 
 // ═══════════════════════════════════════
@@ -127,7 +126,7 @@ function processTick(pid: string): void {
 
             state.broken++;
         } catch (error) {
-            console.warn(`[VM] 方块操作失败 (${pos.x},${pos.y},${pos.z}): ${error}`);
+            console.warn(`[VMT] block op error (${pos.x},${pos.y},${pos.z}): ${error}`);
             // 工具损坏 / 方块已消失 / 玩家下线 → 停止
             state.blocks = [];
             break;
@@ -153,14 +152,14 @@ function finishPlayer(pid: string, state: QueueState | undefined): void {
         try {
             const player = world.getPlayers().find(p => p.id === pid);
             if (player) {
-                player.onScreenDisplay.setActionBar(`${TAG} §a连锁破坏了 ${state.broken} 个方块`);
+                player.onScreenDisplay.setActionBar([rawtext(TAG + ' §a'), tf1('veinminer.tip.broken', String(state.broken))]);
 
                 if (state.collectDrops && state.droppedItems.length > 0) {
                     collectDropsToOrigin(state.origin, state.droppedItems);
                 }
             }
         } catch (error) {
-            console.warn(`[VM] 任务完成回调失败: ${error}`);
+            console.warn(`[VMT] finish callback error: ${error}`);
         }
     }
 }
@@ -177,7 +176,7 @@ function collectDropsToOrigin(target: Vector3, items: Entity[]): void {
                     item.teleport(target, { keepVelocity: false });
                 }
             } catch (error) {
-                console.warn(`[VM] 掉落物传送失败: ${error}`);
+                console.warn(`[VMT] drop teleport error: ${error}`);
             }
         }
     });

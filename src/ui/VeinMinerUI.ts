@@ -19,6 +19,7 @@ import {
     getWhitelist, clearWhitelist, formatWhitelist,
 } from './WhiteListManager';
 import { syncHud } from '../main';
+import { t, tf1, tagged, rawtext, TAG } from '../utils/LangHelper';
 
 // ═══════════════════════════════════════
 //  DynamicProperties (UI 专属)
@@ -88,44 +89,44 @@ export async function showSettings(player: Player): Promise<void> {
 
         // 构建表单
         const form = new ModalFormData()
-            .title('VeinMiner 设置')
+            .title(t('veinminer.ui.title'))
 
             // 0: 连锁开关
-            .toggle('连锁挖矿', { defaultValue: toggle })
+            .toggle(t('veinminer.ui.toggle'), { defaultValue: toggle })
 
             // 1: 最大连锁数
-            .slider('最大连锁数', 1, 256, {
+            .slider(t('veinminer.ui.max_vein'), 1, 256, {
                 defaultValue: maxVein,
                 valueStep: 1,
             })
 
             // 2: 搜索深度
-            .slider('搜索深度', 1, 32, {
+            .slider(t('veinminer.ui.max_depth'), 1, 32, {
                 defaultValue: maxDepth,
                 valueStep: 1,
             })
 
             // 3: 耐久保护
-            .toggle('耐久保护 (工具快坏时停止)', { defaultValue: dur })
+            .toggle(t('veinminer.ui.durability_full'), { defaultValue: dur })
 
             // 4: 自动补种
-            .toggle('自动补种 (破坏后补回树苗)', { defaultValue: repl });
+            .toggle(t('veinminer.ui.replant_full'), { defaultValue: repl });
 
         // 5: 白名单标签
         if (wlItems.length === 0) {
-            form.label('白名单: (空)');
+            form.label(t('veinminer.ui.whitelist_label_empty'));
         } else {
-            form.label('白名单: ' + formatWhitelist(wlItems));
+            form.label(tf1('veinminer.ui.whitelist_label', formatWhitelist(wlItems)));
         }
 
         // 6: 清空白名单
-        form.toggle('清空白名单', { defaultValue: false });
+        form.toggle(t('veinminer.ui.whitelist.clear'), { defaultValue: false });
 
         if (op) {
             // 7: 掉落物集中
-            form.toggle('掉落物集中 (传送到挖掘起点)', { defaultValue: collect })
+            form.toggle(t('veinminer.ui.collect_drops_full'), { defaultValue: collect })
             // 8: 自动破叶
-            .toggle('自动破叶 (砍树时连带树叶)', { defaultValue: leaves });
+            .toggle(t('veinminer.ui.auto_leaves_full'), { defaultValue: leaves });
         }
 
         // ── 显示 ──
@@ -161,9 +162,9 @@ export async function showSettings(player: Player): Promise<void> {
             setPlayerAutoLeaves(player, v[8] as boolean);
         }
 
-        player.sendMessage('§8[VM] §a设置已保存');
+        player.sendMessage(tagged('veinminer.ui.saved'));
     } catch (error) {
-        console.warn(`[VM] 设置表单出错: ${error}`);
-        player.sendMessage('§8[VM] §c设置界面出错: ' + error);
+        console.warn(`[VMT] 设置表单出错: ${error}`);
+        player.sendMessage(tagged('veinminer.tip.settings_error'));
     }
 }
