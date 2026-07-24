@@ -5,7 +5,7 @@
         "type": "panel",
         "anchor_from": "top_right",
         "anchor_to": "top_right",
-        "size": [62, 24],
+        "size": [64, 28],
         "clip": false,
         "layer": 100,
         "controls": [
@@ -17,7 +17,7 @@
     "vm_bg": {
         "type": "image",
         "texture": "textures/ui/White",
-        "size": [58, 18],
+        "size": [60, 22],
         "anchor_from": "center",
         "anchor_to": "center",
         "alpha": 0.35,
@@ -30,39 +30,59 @@
         "orientation": "horizontal",
         "anchor_from": "top_right",
         "anchor_to": "top_right",
-        "offset": [-6, 5],
+        "offset": [-6, 6],
         "layer": 1,
         "controls": [
-            { "vm_gear@vm.vm_gear_img": {} },
+            { "vm_gear@vm.vm_gear_btn": {} },
             { "vm_sep@vm.vm_sep_img": {} },
-            { "vm_toggle_on@vm.vm_toggle_on_img": {} },
-            { "vm_toggle_off@vm.vm_toggle_off_img": {} }
+            { "vm_toggle_on@vm.vm_toggle_on_btn": {} },
+            { "vm_toggle_off@vm.vm_toggle_off_btn": {} }
         ]
     },
 
-    "vm_gear_img": {
-        "type": "image",
+    "vm_gear_btn": {
+        "type": "button",
         "texture": "textures/ui/icon_setting",
-        "size": [16, 16],
-        "offset": [0, 2],
-        "color": [0.7, 0.7, 0.7]
+        "size": [20, 20],
+        "offset": [0, 1],
+        "color": [0.7, 0.7, 0.7],
+        "hover_color": [0.9, 0.9, 0.9],
+        "pressed_color": [0.5, 0.5, 0.5],
+        "focus_enabled": true,
+        "button_mappings": [
+            {
+                "from_button_id": "button.menu_select",
+                "to_control_id": "vm.gear.press",
+                "mapping_type": "pressed"
+            }
+        ]
     },
 
     "vm_sep_img": {
         "type": "image",
         "texture": "textures/ui/White",
-        "size": [1, 12],
+        "size": [1, 14],
         "color": [0.5, 0.5, 0.5],
         "alpha": 0.4
     },
 
-    "vm_toggle_on_img": {
-        "type": "image",
+    "vm_toggle_on_btn": {
+        "type": "button",
         "texture": "textures/ui/toggle_on",
-        "size": [20, 12],
-        "offset": [0, 4],
+        "size": [24, 14],
+        "offset": [0, 5],
         "color": [0.3, 1.0, 0.3],
+        "hover_color": [0.4, 1.0, 0.4],
+        "pressed_color": [0.2, 0.8, 0.2],
         "visible": false,
+        "focus_enabled": true,
+        "button_mappings": [
+            {
+                "from_button_id": "button.menu_select",
+                "to_control_id": "vm.toggle.press",
+                "mapping_type": "pressed"
+            }
+        ],
         "bindings": [
             {
                 "binding_type": "global",
@@ -76,13 +96,23 @@
         ]
     },
 
-    "vm_toggle_off_img": {
-        "type": "image",
+    "vm_toggle_off_btn": {
+        "type": "button",
         "texture": "textures/ui/toggle_off",
-        "size": [20, 12],
-        "offset": [0, 4],
+        "size": [24, 14],
+        "offset": [0, 5],
         "color": [0.5, 0.5, 0.5],
+        "hover_color": [0.6, 0.6, 0.6],
+        "pressed_color": [0.4, 0.4, 0.4],
         "visible": true,
+        "focus_enabled": true,
+        "button_mappings": [
+            {
+                "from_button_id": "button.menu_select",
+                "to_control_id": "vm.toggle.press",
+                "mapping_type": "pressed"
+            }
+        ],
         "bindings": [
             {
                 "binding_type": "global",
@@ -92,6 +122,19 @@
                 "binding_type": "view",
                 "source_property_name": "(((#hud_title_text_string - 'vm:1') = #hud_title_text_string))",
                 "target_property_name": "#visible"
+            }
+        ]
+    },
+
+    "hud_screen": {
+        "button_press_handlers": [
+            {
+                "control_name": "vm.gear.press",
+                "commands": ["/scriptevent vm:s"]
+            },
+            {
+                "control_name": "vm.toggle.press",
+                "commands": ["/scriptevent vm:t"]
             }
         ]
     },
@@ -106,5 +149,4 @@
                 ]
             }
         ]
-    }
-}
+    }\n}
