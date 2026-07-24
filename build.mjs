@@ -19,8 +19,7 @@ const BP_DIR = path.join(ROOT, 'behavior_pack');
 const RP_DIR = path.join(ROOT, 'resource_pack');
 const ENTRY = path.join(ROOT, 'src', 'main.ts');
 const OUTPUT_DIR = path.join(ROOT, 'upload');
-const DOWNLOAD_DIR = '/home/z/my-project/download';
-const VERSION = 'v0.0.3';
+const VERSION = process.env.PACK_VERSION || 'v0.0.3';
 
 // ═══════════════════════════════════════
 //  esbuild

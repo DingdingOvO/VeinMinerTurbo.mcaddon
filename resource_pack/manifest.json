@@ -1,0 +1,23 @@
+{
+    "format_version": 2,
+    "header": {
+        "name": "VeinMinerTurbo UI",
+        "description": "VeinMinerTurbo HUD",
+        "uuid": "02ba4fd1-b178-4a39-9dfd-0dd99b13caf7",
+        "version": [0, 0, 3],
+        "min_engine_version": [1, 21, 0]
+    },
+    "modules": [
+        {
+            "type": "resources",
+            "uuid": "6ec22495-ac0e-4ec3-a62f-275ee1e65444",
+            "version": [0, 0, 3]
+        }
+    ],
+    "dependencies": [
+        {
+            "uuid": "38fac878-f8ee-4f28-a010-620ba2a7c662",
+            "version": [0, 0, 3]
+        }
+    ]
+}

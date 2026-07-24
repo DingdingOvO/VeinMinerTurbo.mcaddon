@@ -1,36 +1,18 @@
+# Dependencies
 node_modules/
-package-lock.json
 
 # Build output
-behavior_pack/scripts/
-
-# Packages
 upload/
 *.mcpack
 *.mcaddon
 
+# Compiled script (built by CI or locally)
+behavior_pack/scripts/
+
 # IDE / OS
 .DS_Store
 Thumbs.db
-tool-results/
-
-# Non-project
-skills/
-.env
-source/
-resource_pack/
-download/
-.zscripts/
-scripts/
-mini-services/
-examples/
-db/
-public/
-bun.lock
-Caddyfile
-components.json
-eslint.config.mjs
-next.config.ts
-postcss.config.mjs
-tailwind.config.ts
-prisma/
+*.swp
+*.swo
+.idea/
+.vscode/

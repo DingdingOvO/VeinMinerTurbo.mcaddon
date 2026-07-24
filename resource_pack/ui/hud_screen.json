@@ -1,0 +1,15 @@
+{
+    "namespace": "vm",
+
+    "root_panel": {
+        "modifications": [
+            {
+                "array_name": "controls",
+                "operation": "insert_front",
+                "value": [
+                    { "vm_hud@vm.vm_hud_panel": {} }
+                ]
+            }
+        ]
+    }
+}
