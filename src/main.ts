@@ -19,9 +19,10 @@ import { t, tf1, tagged, rawtext, TAG } from './utils/LangHelper';
 //  HUD 同步：通过 title 文本驱动 JSON UI 绑定
 // ═══════════════════════════════════════
 
-/** 向 HUD 推送开关状态。title 文本 'vm:1' / 'vm:0' 会被 JSON UI 绑定读取 */
+/** 向 HUD 推送开关状态。title 文本 'vm:1' / 'vm:0' 会被 JSON UI 绑定读取
+ *  times 0 5 0: 5 tick 显示时间（250ms）足够绑定读取值，闪一下几乎不可见 */
 export function syncHud(player: Player, enabled: boolean): void {
-    player.runCommand('title @s times 0 0 0');
+    player.runCommand('title @s times 0 5 0');
     player.runCommand(`title @s title ${enabled ? 'vm:1' : 'vm:0'}`);
 }
 

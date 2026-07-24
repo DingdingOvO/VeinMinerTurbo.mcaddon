@@ -5,7 +5,9 @@
         "type": "panel",
         "anchor_from": "top_right",
         "anchor_to": "top_right",
-        "size": ["default", "default"],
+        "size": [62, 24],
+        "clip": false,
+        "layer": 100,
         "controls": [
             { "vm_bg@vm.vm_bg": {} },
             { "vm_row@vm.vm_row": {} }
@@ -15,10 +17,10 @@
     "vm_bg": {
         "type": "image",
         "texture": "textures/ui/White",
-        "size": ["100%c + 10px", "100%c + 6px"],
+        "size": [58, 18],
         "anchor_from": "center",
         "anchor_to": "center",
-        "alpha": 0.4,
+        "alpha": 0.35,
         "color": [0, 0, 0],
         "layer": 0
     },
@@ -28,7 +30,7 @@
         "orientation": "horizontal",
         "anchor_from": "top_right",
         "anchor_to": "top_right",
-        "offset": [-6, 4],
+        "offset": [-6, 5],
         "layer": 1,
         "controls": [
             { "vm_gear@vm.vm_gear_img": {} },
@@ -60,6 +62,7 @@
         "size": [20, 12],
         "offset": [0, 4],
         "color": [0.3, 1.0, 0.3],
+        "visible": false,
         "bindings": [
             {
                 "binding_type": "global",
@@ -79,6 +82,7 @@
         "size": [20, 12],
         "offset": [0, 4],
         "color": [0.5, 0.5, 0.5],
+        "visible": true,
         "bindings": [
             {
                 "binding_type": "global",
