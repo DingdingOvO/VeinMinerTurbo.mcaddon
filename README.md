@@ -46,9 +46,8 @@ VeinMiner-Package/
 │   ├── manifest.json
 │   ├── _ui_defs.json         # UI definitions entry (must be at RP root)
 │   ├── ui/
-│   │   ├── vm_hud_def.json   # HUD element type definitions
-│   │   └── hud_screen.json   # HUD screen modification
-│   ├── texts/                # Pack name/description lang files
+│   │   └── hud_screen.json   # HUD element defs + screen modification (merged)
+│   ├── texts/                # Translation lang files (BP + RP both have copies)
 │   └── pack_icon.png
 ├── .github/workflows/release.yml
 ├── build.mjs

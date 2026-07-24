@@ -1,6 +1,5 @@
 {
     "ui_defs": [
-        "ui/vm_hud_def.json",
         "ui/hud_screen.json"
     ]
 }

@@ -21,6 +21,7 @@ import { t, tf1, tagged, rawtext, TAG } from './utils/LangHelper';
 
 /** 向 HUD 推送开关状态。title 文本 'vm:1' / 'vm:0' 会被 JSON UI 绑定读取 */
 export function syncHud(player: Player, enabled: boolean): void {
+    player.runCommand('title @s times 0 0 0');
     player.runCommand(`title @s title ${enabled ? 'vm:1' : 'vm:0'}`);
 }
 
