@@ -4,6 +4,8 @@
 pack.name=VeinMinerTurbo
 pack.description=VeinMinerTurbo HUD
 vm.hud.label=VeinMinerTurbo
+vm.hud.on=ON
+vm.hud.off=OFF
 
 ## ===== UI =====
 veinminer.ui.title=VeinMinerTurbo Settings

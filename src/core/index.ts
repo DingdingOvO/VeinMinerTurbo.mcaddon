@@ -6,4 +6,3 @@ export { bfsScan, sortByDistance } from './Scanner';
 export type { Pos, ScanResult } from './Scanner';
 export { scanLeaves } from './TreeDetector';
 export { executeBreak } from './BreakExecutor';
-export { getExcavateBlocks } from './Excavate';

@@ -13,6 +13,7 @@ export const LOG_IDS: readonly string[] = [
     'minecraft:dark_oak_log',
     'minecraft:mangrove_log',
     'minecraft:cherry_log',
+    'minecraft:pale_oak_log',
     'minecraft:crimson_stem',
     'minecraft:warped_stem',
 ];

@@ -4,6 +4,8 @@
 pack.name=VeinMinerTurbo 連鎖挖礦
 pack.description=VeinMinerTurbo HUD - 狀態指示器
 vm.hud.label=VeinMinerTurbo
+vm.hud.on=開
+vm.hud.off=關
 
 ## ===== UI =====
 veinminer.ui.title=VeinMinerTurbo 設定

@@ -15,4 +15,5 @@ export const LEAF_IDS: readonly string[] = [
     'minecraft:cherry_leaves',
     'minecraft:azalea_leaves',
     'minecraft:azalea_leaves_flowered',
+    'minecraft:pale_oak_leaves',
 ];

@@ -4,7 +4,7 @@
  * 使用 ModalFormData（老式表单 API），
  * toggle/slider 接收普通 boolean/number，不依赖 Observable/DDUI。
  *
- * 触发: #vm / /scriptevent veinminer:settings
+ * 触发: /scriptevent vm:s
  */
 
 import { Player, system } from '@minecraft/server';
@@ -87,45 +87,50 @@ export async function showSettings(player: Player): Promise<void> {
             leaves  = getPlayerAutoLeaves(player);
         }
 
-        // 构建表单
+        // ═══════════════════════════════════════
+        //  构建表单
+        //  注意：label 不产生 formValues，因此用 idx 追踪实际值索引
+        // ═══════════════════════════════════════
+        const IDX = { TOGGLE: 0, MAX_VEIN: 1, MAX_DEPTH: 2, DURABILITY: 3, REPLANT: 4, CLEAR_WL: 5, COLLECT: 6, AUTO_LEAVES: 7 };
+
         const form = new ModalFormData()
             .title(t('veinminer.ui.title'))
 
-            // 0: 连锁开关
+            // IDX.TOGGLE = 0
             .toggle(t('veinminer.ui.toggle'), { defaultValue: toggle })
 
-            // 1: 最大连锁数
+            // IDX.MAX_VEIN = 1
             .slider(t('veinminer.ui.max_vein'), 1, 256, {
                 defaultValue: maxVein,
                 valueStep: 1,
             })
 
-            // 2: 搜索深度
+            // IDX.MAX_DEPTH = 2
             .slider(t('veinminer.ui.max_depth'), 1, 32, {
                 defaultValue: maxDepth,
                 valueStep: 1,
             })
 
-            // 3: 耐久保护
+            // IDX.DURABILITY = 3
             .toggle(t('veinminer.ui.durability_full'), { defaultValue: dur })
 
-            // 4: 自动补种
+            // IDX.REPLANT = 4
             .toggle(t('veinminer.ui.replant_full'), { defaultValue: repl });
 
-        // 5: 白名单标签
+        // label — 不产生值，不影响 IDX
         if (wlItems.length === 0) {
             form.label(t('veinminer.ui.whitelist_label_empty'));
         } else {
             form.label(tf1('veinminer.ui.whitelist_label', formatWhitelist(wlItems)));
         }
 
-        // 6: 清空白名单
+        // IDX.CLEAR_WL = 5
         form.toggle(t('veinminer.ui.whitelist.clear'), { defaultValue: false });
 
         if (op) {
-            // 7: 掉落物集中
+            // IDX.COLLECT = 6
             form.toggle(t('veinminer.ui.collect_drops_full'), { defaultValue: collect })
-            // 8: 自动破叶
+            // IDX.AUTO_LEAVES = 7
             .toggle(t('veinminer.ui.auto_leaves_full'), { defaultValue: leaves });
         }
 
@@ -145,21 +150,20 @@ export async function showSettings(player: Player): Promise<void> {
 
         // ── 保存 ──
 
-        setPlayerToggle(player, v[0] as boolean);
-        syncHud(player, v[0] as boolean);
-        setPlayerMaxVein(player, v[1] as number);
-        setMaxDepth(player, v[2] as number);
-        setDurability(player, v[3] as boolean);
-        setReplant(player, v[4] as boolean);
+        setPlayerToggle(player, v[IDX.TOGGLE] as boolean);
+        syncHud(player, v[IDX.TOGGLE] as boolean);
+        setPlayerMaxVein(player, v[IDX.MAX_VEIN] as number);
+        setMaxDepth(player, v[IDX.MAX_DEPTH] as number);
+        setDurability(player, v[IDX.DURABILITY] as boolean);
+        setReplant(player, v[IDX.REPLANT] as boolean);
 
-        // v[5] 是 label，跳过
-        if (v[6] as boolean) {
+        if (v[IDX.CLEAR_WL] as boolean) {
             clearWhitelist(player);
         }
 
         if (op) {
-            setPlayerCollectDrops(player, v[7] as boolean);
-            setPlayerAutoLeaves(player, v[8] as boolean);
+            setPlayerCollectDrops(player, v[IDX.COLLECT] as boolean);
+            setPlayerAutoLeaves(player, v[IDX.AUTO_LEAVES] as boolean);
         }
 
         player.sendMessage(tagged('veinminer.ui.saved'));

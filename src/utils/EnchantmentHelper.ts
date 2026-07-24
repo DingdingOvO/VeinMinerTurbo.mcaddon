@@ -9,6 +9,7 @@
  */
 
 import { Player, ItemStack, Dimension, Vector3, Entity } from '@minecraft/server';
+import { getEnchantLevel } from './ToolHelper';
 
 // ═══════════════════════════════════════
 //  矿物掉落映射表
@@ -67,30 +68,25 @@ const EXP_MAP: Record<string, number> = {
 };
 
 // ═══════════════════════════════════════
-//  公共接口
+//  获取玩家手持工具的附魔等级
 // ═══════════════════════════════════════
 
-/**
- * 获取玩家手持物品的指定附魔等级
- * @returns 附魔等级，没有则返回 0
- */
-export function getEnchantLevel(player: Player, enchantId: string): number {
+/** 获取玩家手持物品的指定附魔等级 */
+export function getHeldEnchantLevel(player: Player, enchantId: string): number {
     try {
         const inventory = player.getComponent('inventory');
         if (!inventory || !inventory.container) return 0;
-
         const item = inventory.container.getItem(player.selectedSlotIndex);
         if (!item) return 0;
-
-        const enchantable = item.getComponent('minecraft:enchantable');
-        if (!enchantable) return 0;
-
-        const ench = enchantable.getEnchantment(enchantId);
-        return ench?.level ?? 0;
+        return getEnchantLevel(item, enchantId);
     } catch {
         return 0;
     }
 }
+
+// ═══════════════════════════════════════
+//  公共接口
+// ═══════════════════════════════════════
 
 /**
  * 根据方块类型和附魔计算掉落物
@@ -103,13 +99,13 @@ export function getDrops(
     const entry = BLOCK_DROP_MAP[blockId];
     if (!entry) return null;
 
-    const silkTouch = getEnchantLevel(player, 'silk_touch') > 0;
+    const silkTouch = getHeldEnchantLevel(player, 'silk_touch') > 0;
 
     if (silkTouch) {
         return [{ itemId: blockId, count: 1 }];
     }
 
-    const fortuneLevel = getEnchantLevel(player, 'fortune');
+    const fortuneLevel = getHeldEnchantLevel(player, 'fortune');
     let finalCount = entry.count;
 
     if (entry.fortuneScale && fortuneLevel > 0) {

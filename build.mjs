@@ -39,11 +39,11 @@ function readPkgVersion() {
     return pkg.version;
 }
 
-/** "0.0.3" → "v0.0.3" */
-function toTag(v) { return `v${v}`; }
+/** "0.0.3" → "v0.0.3". Strips leading 'v' first to avoid double-prefix. */
+function toTag(v) { return `v${v.replace(/^v/, '')}`; }
 
-/** "0.0.3" → [0, 0, 3] */
-function toSemverArray(v) { return v.split('.').map(Number); }
+/** "0.0.3" → [0, 0, 3]. Strips leading 'v' first. */
+function toSemverArray(v) { return v.replace(/^v/, '').split('.').map(Number); }
 
 const RAW_VERSION = process.env.PACK_VERSION || readPkgVersion();
 const VERSION = toTag(RAW_VERSION);
