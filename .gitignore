@@ -16,3 +16,7 @@ Thumbs.db
 *.swo
 .idea/
 .vscode/
+
+# Lock files (bun, npm)
+bun.lock
+package-lock.json
