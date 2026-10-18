@@ -73,6 +73,38 @@ export function setPlayerCollectDrops(p: Player, v: boolean): void {
 }
 
 // ═══════════════════════════════════════
+//  搜索深度
+// ═══════════════════════════════════════
+
+const KEY_MAX_DEPTH = 'veinminer_max_depth';
+const DEFAULT_MAX_DEPTH = 8;
+
+/** 获取最大搜索深度（BFS 层数），默认 8 */
+export function getPlayerMaxDepth(p: Player): number {
+    const v = p.getDynamicProperty(KEY_MAX_DEPTH);
+    return typeof v === 'number' ? v : DEFAULT_MAX_DEPTH;
+}
+
+export function setPlayerMaxDepth(p: Player, v: number): void {
+    p.setDynamicProperty(KEY_MAX_DEPTH, v);
+}
+
+// ═══════════════════════════════════════
+//  耐久保护
+// ═══════════════════════════════════════
+
+const KEY_DURABILITY = 'veinminer_durability';
+
+/** 是否开启耐久保护，默认开启 */
+export function getPlayerDurabilityGuard(p: Player): boolean {
+    return p.getDynamicProperty(KEY_DURABILITY) !== false;
+}
+
+export function setPlayerDurabilityGuard(p: Player, v: boolean): void {
+    p.setDynamicProperty(KEY_DURABILITY, v);
+}
+
+// ═══════════════════════════════════════
 //  3×3×3 挖掘（预留）
 // ═══════════════════════════════════════
 

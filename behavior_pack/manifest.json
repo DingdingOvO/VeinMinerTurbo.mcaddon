@@ -6,13 +6,13 @@
         "uuid": "38fac878-f8ee-4f28-a010-620ba2a7c662",
         "version": [
             0,
-            0,
-            5
+            1,
+            0
         ],
         "min_engine_version": [
             1,
             21,
-            0
+            90
         ]
     },
     "modules": [
@@ -22,8 +22,8 @@
             "uuid": "65594d1d-506c-427c-93f8-447e6a7a44a9",
             "version": [
                 0,
-                0,
-                5
+                1,
+                0
             ],
             "entry": "scripts/main.js"
         }
@@ -31,11 +31,11 @@
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "2.8.0"
+            "version": "2.0.0"
         },
         {
             "module_name": "@minecraft/server-ui",
-            "version": "2.1.0"
+            "version": "2.0.0"
         }
     ]
 }

@@ -1,0 +1,129 @@
+{
+  "namespace": "vm",
+
+  "hud_right_half": {
+    "type": "panel",
+    "size": [ "50%", 40 ],
+    "anchor_from": "top_right",
+    "anchor_to": "top_right",
+    "controls": [
+      { "bar@vm.hud_bar": {} }
+    ]
+  },
+
+  "hud_bar": {
+    "type": "panel",
+    "size": [ 150, 24 ],
+    "anchor_from": "top_middle",
+    "anchor_to": "top_middle",
+    "offset": [ 0, 6 ],
+    "controls": [
+      { "btn_toggle@vm.toggle_button": { "offset": [ 0, 0 ] } },
+      { "btn_gear@vm.gear_button": { "offset": [ 126, 0 ] } }
+    ]
+  },
+
+  "btn_default": {
+    "type": "image",
+    "texture": "textures/ui/button_borderless_light",
+    "size": [ "100%", "100%" ],
+    "alpha": 0.8
+  },
+
+  "btn_hover": {
+    "type": "image",
+    "texture": "textures/ui/button_borderless_lighthover",
+    "size": [ "100%", "100%" ],
+    "alpha": 0.9
+  },
+
+  "btn_pressed": {
+    "type": "image",
+    "texture": "textures/ui/button_borderless_lightpressed",
+    "size": [ "100%", "100%" ],
+    "alpha": 0.9
+  },
+
+  "toggle_button@common.button": {
+    "size": [ 120, 24 ],
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "$pressed_button_name": "button.menu_select",
+    "focus_enabled": false,
+    "controls": [
+      { "default@vm.btn_default": {} },
+      { "hover@vm.btn_hover": {} },
+      { "pressed@vm.btn_pressed": {} },
+      { "label_on@vm.label_on": {} },
+      { "label_off@vm.label_off": {} }
+    ]
+  },
+
+  "label_on": {
+    "type": "label",
+    "text": "vm.hud.toggle_on",
+    "font_type": "default",
+    "color": [ 0.35, 0.92, 0.35 ],
+    "shadow": true,
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "bindings": [
+      {
+        "binding_type": "global",
+        "binding_name": "#hud_title_text_string",
+        "binding_name_override": "#vm_state"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(not (#vm_state = 'vm:0'))",
+        "target_property_name": "#visible"
+      }
+    ]
+  },
+
+  "label_off": {
+    "type": "label",
+    "text": "vm.hud.toggle_off",
+    "font_type": "default",
+    "color": [ 0.95, 0.35, 0.35 ],
+    "shadow": true,
+    "anchor_from": "center",
+    "anchor_to": "center",
+    "bindings": [
+      {
+        "binding_type": "global",
+        "binding_name": "#hud_title_text_string",
+        "binding_name_override": "#vm_state"
+      },
+      {
+        "binding_type": "view",
+        "source_property_name": "(#vm_state = 'vm:0')",
+        "target_property_name": "#visible"
+      }
+    ]
+  },
+
+  "gear_button@common.button": {
+    "size": [ 24, 24 ],
+    "anchor_from": "top_left",
+    "anchor_to": "top_left",
+    "$pressed_button_name": "button.menu_select",
+    "focus_enabled": false,
+    "controls": [
+      { "default@vm.btn_default": {} },
+      { "hover@vm.btn_hover": {} },
+      { "pressed@vm.btn_pressed": {} },
+      {
+        "icon": {
+          "type": "image",
+          "texture": "textures/ui/icon_setting",
+          "size": [ 16, 16 ],
+          "anchor_from": "center",
+          "anchor_to": "center",
+          "color": [ 1.0, 1.0, 1.0 ],
+          "layer": 2
+        }
+      }
+    ]
+  }
+}

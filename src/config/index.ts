@@ -15,5 +15,7 @@ export {
     getPlayerMaxVein, setPlayerMaxVein,
     getPlayerAutoLeaves, setPlayerAutoLeaves,
     getPlayerCollectDrops, setPlayerCollectDrops,
+    getPlayerMaxDepth, setPlayerMaxDepth,
+    getPlayerDurabilityGuard, setPlayerDurabilityGuard,
     getPlayerExcavate, setPlayerExcavate,
 } from './PlayerConfig';

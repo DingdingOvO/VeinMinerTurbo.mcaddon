@@ -42,9 +42,17 @@ export interface ScanResult {
 //  BFS 扫描
 // ═══════════════════════════════════════
 
-function posKey(x: number, y: number, z: number): bigint {
-    return (BigInt(x) << 64n) ^ (BigInt(y) << 32n) ^ BigInt(z);
+/**
+ * 坐标 key。
+ * 旧实现用 BigInt 左移 + 异或：负数会按补码符号扩展，导致不同坐标得到相同 key，
+ * 表现为漏块 / 重复访问。这里改为字符串 key，无碰撞。
+ */
+function posKey(x: number, y: number, z: number): string {
+    return `${x},${y},${z}`;
 }
+
+/** BFS 最大迭代次数硬限制，防止极端情况下卡服 */
+const MAX_BFS_ITERATIONS = 20000;
 
 /**
  * BFS 扫描相连的同类型方块
@@ -54,10 +62,8 @@ function posKey(x: number, y: number, z: number): bigint {
  * @param maxBlocks 最大数量
  * @param timeoutMs 超时（ms）
  * @param use26Dir  是否使用26面方向（原木=true，矿石=false）
+ * @param maxDepth  最大搜索深度（BFS 层数，1 = 只找相邻一圈）
  */
-/** BFS 最大迭代次数硬限制，防止极端情况下卡服 */
-const MAX_BFS_ITERATIONS = 1000;
-
 export function bfsScan(
     dim: Dimension,
     start: Vector3,
@@ -65,6 +71,7 @@ export function bfsScan(
     maxBlocks: number,
     timeoutMs: number,
     use26Dir: boolean,
+    maxDepth: number = 32,
 ): ScanResult {
     const dirs = use26Dir ? DIR_26 : DIR_6;
     const sx = Math.floor(start.x);
@@ -72,20 +79,28 @@ export function bfsScan(
     const sz = Math.floor(start.z);
 
     const result: Pos[] = [{ x: sx, y: sy, z: sz }];
-    const visited = new Set<bigint>([posKey(sx, sy, sz)]);
-    const queue: Pos[] = [{ x: sx, y: sy, z: sz }];
+    const visited = new Set<string>([posKey(sx, sy, sz)]);
+    // 队列同时记录层数，用于 maxDepth 限制
+    const queue: Array<{ x: number; y: number; z: number; d: number }> = [
+        { x: sx, y: sy, z: sz, d: 0 },
+    ];
     const t0 = Date.now();
     let iterations = 0;
+    let head = 0;
 
-    while (queue.length > 0) {
+    while (head < queue.length) {
         if (++iterations > MAX_BFS_ITERATIONS) {
-            console.warn(`[VMT] BFS 达到迭代上限 (${MAX_BFS_ITERATIONS})，已收集 ${result.length} 个方块`);
+            console.warn(`[VMT] BFS 达到迭代上限，已收集 ${result.length} 个方块`);
             return { blocks: result, timedOut: false };
         }
         if (Date.now() - t0 > timeoutMs) return { blocks: result, timedOut: true };
         if (result.length >= maxBlocks) return { blocks: result, timedOut: false };
 
-        const cur = queue.shift()!;
+        // 用 head 索引代替 shift()，避免每轮 O(n) 数组搬移
+        const cur = queue[head++];
+
+        if (cur.d >= maxDepth) continue;
+
         for (const d of dirs) {
             const nx = cur.x + d.x;
             const ny = cur.y + d.y;
@@ -103,7 +118,7 @@ export function bfsScan(
 
             const pos: Pos = { x: nx, y: ny, z: nz };
             result.push(pos);
-            queue.push(pos);
+            queue.push({ ...pos, d: cur.d + 1 });
             if (result.length >= maxBlocks) return { blocks: result, timedOut: false };
         }
     }

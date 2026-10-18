@@ -5,22 +5,29 @@ A high-performance vein mining addon for Minecraft Bedrock Edition. Sneak + mine
 ## Features
 
 - **Sneak + Mine** — Hold sneak and break a block to chain-mine all connected same-type blocks
-- **BFS Scanner** — Flood-fill with configurable max range, depth limit, and 100ms timeout to prevent server lag
+- **BFS Scanner** — Flood-fill with configurable max range, max depth, and 100ms timeout to prevent server lag
 - **Per-Tick Queue** — Breaks blocks in batches of 20/tick across ticks, zero server freeze
 - **Enchantment Support** — Silk Touch and Fortune are correctly applied to ore drops
 - **Auto Leaves** — When chopping trees, optionally break nearby leaves too
 - **Drop Collection** — Teleport all drops to the break origin for easy pickup
-- **HUD Indicator** — Top-right HUD shows on/off state via JSON UI
-- **Whitelist** — Add any block to your personal mining whitelist
+- **HUD Panel** — Top-center of the right half of the screen: `连锁采集：开/关` (green/red) + a standard gear button
+- **Remote Item** — `vm:remote`, right-click to toggle, sneak + right-click to open settings
+- **Whitelist** — Add any block to your personal mining whitelist (`/scriptevent vm:a`)
 - **i18n** — English, 简体中文, 繁體中文
 - **Settings UI** — ModalFormData with sliders and toggles
+
+> **Note on the HUD buttons**
+> Bedrock's JSON UI is declarative: it can render buttons and bind values, but it has **no callback into scripts**.
+> There is no `button_press_handlers` field in the UI schema (0 occurrences in Mojang's vanilla `hud_screen.json`).
+> The only API with a real `onClick` is `CustomForm.button()` (`@minecraft/server-ui` 2.1.0), which is a modal form — it cannot be pinned to a HUD position.
+> Therefore the HUD panel shows state, while the actual toggle is done with the **remote item** or `/scriptevent vm:t`.
 
 ## Project Structure
 
 ```
-VeinMiner-Package/
+VeinMinerTurbo/
 ├── src/
-│   ├── main.ts              # Entry point, scriptEvent listeners, HUD sync
+│   ├── main.ts              # Entry point, scriptEvent + remote item, HUD sync
 │   ├── core/
 │   │   ├── VeinMiner.ts      # Block break event handler
 │   │   ├── Scanner.ts        # BFS flood-fill scanner
@@ -29,25 +36,29 @@ VeinMiner-Package/
 │   │   └── Excavate.ts       # Excavation mode (experimental)
 │   ├── ui/
 │   │   ├── VeinMinerUI.ts    # Settings form (ModalFormData)
+│   │   ├── HudSync.ts        # Pushes toggle state into the JSON UI
 │   │   └── WhiteListManager.ts
 │   ├── config/
 │   │   ├── Constants.ts      # Default values
 │   │   ├── PlayerConfig.ts   # DynamicProperty-based per-player config
 │   │   └── blocks/           # Ore, Log, Leaf, Blacklist block ID lists
 │   └── utils/
-│       ├── LangHelper.ts     # RawMessage.translate helpers (t, tf1, tf2, tagged)
+│       ├── LangHelper.ts     # RawMessage.translate helpers
 │       ├── EnchantmentHelper.ts  # Fortune/Silk Touch drop calculation
 │       └── ToolHelper.ts     # Durability check
 ├── behavior_pack/
 │   ├── manifest.json
-│   ├── texts/                # en_US.lang, zh_CN.lang, zh_TW.lang
+│   ├── items/remote.json     # vm:remote item
+│   ├── texts/
 │   └── scripts/main.js       # ← esbuild output (gitignored)
 ├── resource_pack/
 │   ├── manifest.json
 │   ├── _ui_defs.json         # UI definitions entry (must be at RP root)
 │   ├── ui/
-│   │   └── hud_screen.json   # HUD element defs + screen modification (merged)
-│   ├── texts/                # Translation lang files (BP + RP both have copies)
+│   │   ├── vm_hud.json       # HUD controls (namespace: vm)
+│   │   └── vm_hud_mod.json   # Modifies hud.hud_screen (namespace: hud)
+│   ├── textures/item_texture.json
+│   ├── texts/
 │   └── pack_icon.png
 ├── .github/workflows/release.yml
 ├── build.mjs
@@ -56,8 +67,6 @@ VeinMiner-Package/
 ```
 
 ## Commands
-
-All commands use `/scriptevent`:
 
 | Command | Description |
 |---|---|
@@ -70,13 +79,13 @@ All commands use `/scriptevent`:
 ```bash
 npm install
 npm run build
-# → upload/VeinMinerTurbo-v0.0.3.mcaddon
+# → upload/VeinMinerTurbo-v0.1.0.mcaddon
 ```
 
 Set version via environment variable:
 
 ```bash
-PACK_VERSION=v0.1.0 npm run build
+PACK_VERSION=v0.1.1 npm run build
 ```
 
 ## Install
@@ -88,31 +97,31 @@ PACK_VERSION=v0.1.0 npm run build
 
 ## Usage
 
-1. **Sneak + Mine** any ore or log block to chain-break all connected same-type blocks
-2. **`/scriptevent vm:s`** to open the settings form and configure:
+1. **Sneak + Mine** any ore, log, or whitelisted block to chain-break all connected blocks
+2. **Right-click the remote** (`vm:remote`) to toggle; **sneak + right-click** to open settings
+3. **`/scriptevent vm:s`** opens the settings form:
    - Vein mining on/off
    - Max range (1–256 blocks)
    - Max search depth (1–32)
-   - Durability guard
-   - Auto replant
+   - Durability guard (stops before the tool breaks)
+   - Custom block whitelist (clear)
    - Drop collection (OP only)
    - Auto leaves (OP only)
-   - Custom block whitelist
-3. **`/scriptevent vm:t`** to quickly toggle on/off
-4. **`/scriptevent vm:a`** to add the block you're looking at to your whitelist
+4. **`/scriptevent vm:a`** adds the block you are looking at to your whitelist
 
 ## Requirements
 
-- Minecraft Bedrock **1.21.0+**
-- `@minecraft/server` **2.8.0**
-- `@minecraft/server-ui` **2.1.0** (experimental)
+- Minecraft Bedrock **1.21.90+**
+- `@minecraft/server` **2.0.0**
+- `@minecraft/server-ui` **2.0.0**
+- World setting: **Beta APIs** enabled
 
 ## Tech Stack
 
 - **TypeScript** + **esbuild** (ESM bundle)
-- **Bedrock Script API** — `world.beforeEvents.playerBreakBlock`, `system.afterEvents.scriptEventReceive`
-- **ModalFormData** for settings UI
-- **JSON UI** (modifications) for HUD overlay
+- **Bedrock Script API** — `world.beforeEvents.playerBreakBlock`, `system.afterEvents.scriptEventReceive`, `world.afterEvents.itemUse`
+- **ModalFormData** for the settings form
+- **JSON UI** for the HUD panel
 - **`_ui_defs.json`** at resource pack root for type definition loading order
 - **`.lang` files** with `RawMessage.translate` for i18n
 - **DynamicProperties** for per-player persistent config

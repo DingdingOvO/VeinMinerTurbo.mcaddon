@@ -1,12 +1,17 @@
 /**
  * TreeDetector.ts — 树叶扫描
  *
- * 在原木位置周围搜索树叶方块
+ * 旧实现：对每个原木都跑一遍 (2r+1)^3 立方体，
+ * 64 个原木 × 729 次 getBlock ≈ 4.6 万次读方块，砍大树会明显卡顿。
+ * 现在改为：先求原木包围盒，只在包围盒外扩 r 的区域内扫描一次。
  */
 
 import { Dimension } from '@minecraft/server';
 import { Pos } from './Scanner';
 import { LEAF_SCAN_RADIUS, LEAF_MAX_COUNT } from '../config';
+
+/** 单次树叶扫描的最大方块读取次数，防止极端大树卡服 */
+const MAX_SCAN_READS = 6000;
 
 /**
  * 在原木位置周围扫描树叶
@@ -24,37 +29,50 @@ export function scanLeaves(
     maxCount: number = LEAF_MAX_COUNT,
 ): Pos[] {
     const leaves: Pos[] = [];
+    if (logPositions.length === 0) return leaves;
+
     const visited = new Set<string>();
+    const logKeys = new Set<string>();
+    for (const log of logPositions) logKeys.add(`${log.x},${log.y},${log.z}`);
 
-    for (const log of logPositions) {
-        if (leaves.length >= maxCount) break;
+    // 包围盒
+    let minX = Infinity, minY = Infinity, minZ = Infinity;
+    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+    for (const p of logPositions) {
+        if (p.x < minX) minX = p.x;
+        if (p.y < minY) minY = p.y;
+        if (p.z < minZ) minZ = p.z;
+        if (p.x > maxX) maxX = p.x;
+        if (p.y > maxY) maxY = p.y;
+        if (p.z > maxZ) maxZ = p.z;
+    }
 
-        for (let dx = -maxRadius; dx <= maxRadius; dx++) {
-            if (leaves.length >= maxCount) break;
-            for (let dy = -maxRadius; dy <= maxRadius; dy++) {
-                if (leaves.length >= maxCount) break;
-                for (let dz = -maxRadius; dz <= maxRadius; dz++) {
-                    if (leaves.length >= maxCount) break;
+    const fromX = minX - maxRadius;
+    const toX = maxX + maxRadius;
+    const fromY = minY - maxRadius;
+    const toY = maxY + maxRadius;
+    const fromZ = minZ - maxRadius;
+    const toZ = maxZ + maxRadius;
 
-                    const dist = Math.abs(dx) + Math.abs(dy) + Math.abs(dz);
-                    if (dist > maxRadius || dist === 0) continue;
+    let reads = 0;
 
-                    const nx = log.x + dx;
-                    const ny = log.y + dy;
-                    const nz = log.z + dz;
-                    const k = `${nx},${ny},${nz}`;
+    for (let x = fromX; x <= toX; x++) {
+        for (let y = fromY; y <= toY; y++) {
+            for (let z = fromZ; z <= toZ; z++) {
+                if (leaves.length >= maxCount) return leaves;
+                if (++reads > MAX_SCAN_READS) return leaves;
 
-                    if (visited.has(k)) continue;
-                    visited.add(k);
+                const k = `${x},${y},${z}`;
+                if (logKeys.has(k) || visited.has(k)) continue;
+                visited.add(k);
 
-                    try {
-                        const block = dim.getBlock({ x: nx, y: ny, z: nz });
-                        if (block && leafTypeIds.has(block.typeId)) {
-                            leaves.push({ x: nx, y: ny, z: nz });
-                        }
-                    } catch {
-                        // 维度边界外等异常，忽略
+                try {
+                    const block = dim.getBlock({ x, y, z });
+                    if (block && leafTypeIds.has(block.typeId)) {
+                        leaves.push({ x, y, z });
                     }
+                } catch {
+                    // 维度边界外等异常，忽略
                 }
             }
         }

@@ -3,27 +3,35 @@
  *
  * 触发方式:
  *   - 潜行 + 破坏方块 -> 连锁挖矿
+ *   - 连锁采集遥控器（vm:remote）  使用 -> 开关；潜行 + 使用 -> 设置
  *   - /scriptevent vm:s -> 打开设置
  *   - /scriptevent vm:t -> 开关
  *   - /scriptevent vm:a -> 添加注视方块到白名单
  */
 
-import { world, system, Player, ScriptEventSource, ScriptEventCommandMessageAfterEvent } from '@minecraft/server';
+import {
+    world, system, Player, ItemStack,
+    ScriptEventSource, ScriptEventCommandMessageAfterEvent,
+} from '@minecraft/server';
 import { registerVeinMiner } from './core';
 import { showSettings } from './ui/VeinMinerUI';
 import { getPlayerToggle, setPlayerToggle } from './config';
 import { addToWhitelist } from './ui/WhiteListManager';
+import { syncHud } from './ui/HudSync';
 import { t, tf1, tagged, rawtext, TAG } from './utils/LangHelper';
 
-// ═══════════════════════════════════════
-//  HUD 同步：通过 title 文本驱动 JSON UI 绑定
-// ═══════════════════════════════════════
+const REMOTE_ID = 'vm:remote';
 
-/** 向 HUD 推送开关状态。title 文本 'vm:1' / 'vm:0' 会被 JSON UI 绑定读取
- *  times 0 5 0: 5 tick 显示时间（250ms）足够绑定读取值，闪一下几乎不可见 */
-export function syncHud(player: Player, enabled: boolean): void {
-    player.runCommand('title @s times 0 5 0');
-    player.runCommand(`title @s title ${enabled ? 'vm:1' : 'vm:0'}`);
+/** 切换开关并广播状态 */
+function toggleVeinMiner(player: Player): void {
+    const next = !getPlayerToggle(player);
+    setPlayerToggle(player, next);
+    syncHud(player, next);
+
+    player.onScreenDisplay.setActionBar([
+        rawtext(TAG + ' '),
+        t(next ? 'veinminer.tip.on' : 'veinminer.tip.off'),
+    ]);
 }
 
 registerVeinMiner();
@@ -43,12 +51,7 @@ system.afterEvents.scriptEventReceive.subscribe(
 
             // vm:t = toggle
             if (id === 'vm:t' || id === 'veinminer:toggle') {
-                const next = !getPlayerToggle(entity);
-                setPlayerToggle(entity, next);
-                syncHud(entity, next);
-                entity.onScreenDisplay.setActionBar(
-                    [rawtext(TAG + ' '), t(next ? 'veinminer.tip.on' : 'veinminer.tip.off')],
-                );
+                toggleVeinMiner(entity);
             // vm:s = settings
             } else if (id === 'vm:s' || id === 'veinminer:settings') {
                 showSettings(entity);
@@ -74,20 +77,64 @@ system.afterEvents.scriptEventReceive.subscribe(
     { namespaces: ['vm', 'veinminer'] },
 );
 
-system.run(() => {
-    for (const player of world.getAllPlayers()) {
-        syncHud(player, getPlayerToggle(player));
-        player.onScreenDisplay.setActionBar(
-            [rawtext(TAG + ' §a'), t('veinminer.tip.loaded'), rawtext(' §7| §f'), t('veinminer.tip.sneak_mine')],
-        );
+// ═══════════════════════════════════════
+//  遥控器物品
+// ═══════════════════════════════════════
+
+world.afterEvents.itemUse.subscribe((ev) => {
+    try {
+        if (ev.itemStack?.typeId !== REMOTE_ID) return;
+        const player = ev.source;
+
+        if (player.isSneaking) {
+            showSettings(player);
+        } else {
+            toggleVeinMiner(player);
+        }
+    } catch (error) {
+        console.warn(`[VMT] item use error: ${error}`);
     }
 });
 
-// 玩家首次进入世界时同步 HUD
-world.afterEvents.playerSpawn.subscribe((ev) => {
-    if (ev.initialSpawn) {
-        system.run(() => {
-            syncHud(ev.player, getPlayerToggle(ev.player));
-        });
+// ═══════════════════════════════════════
+//  进服初始化
+// ═══════════════════════════════════════
+
+system.run(() => {
+    for (const player of world.getAllPlayers()) {
+        syncHud(player, getPlayerToggle(player));
+        player.onScreenDisplay.setActionBar([
+            rawtext(TAG + ' §a'),
+            t('veinminer.tip.loaded'),
+            rawtext(' §7| §f'),
+            t('veinminer.tip.sneak_mine'),
+        ]);
+
+        // 首次安装时给一个遥控器（仅当背包里没有时）
+        grantRemoteOnce(player);
     }
 });
+
+world.afterEvents.playerSpawn.subscribe((ev) => {
+    if (!ev.initialSpawn) return;
+    system.run(() => {
+        syncHud(ev.player, getPlayerToggle(ev.player));
+        grantRemoteOnce(ev.player);
+    });
+});
+
+/** 背包里没有遥控器时补发一个，避免玩家找不到入口 */
+function grantRemoteOnce(player: Player): void {
+    try {
+        const inv = player.getComponent('inventory')?.container;
+        if (!inv) return;
+
+        for (let i = 0; i < inv.size; i++) {
+            if (inv.getItem(i)?.typeId === REMOTE_ID) return;
+        }
+
+        inv.addItem(new ItemStack(REMOTE_ID, 1));
+    } catch {
+        // 背包满 / 未加载，忽略
+    }
+}
