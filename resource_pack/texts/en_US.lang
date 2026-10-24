@@ -3,9 +3,6 @@
 
 pack.name=VeinMinerTurbo
 pack.description=VeinMinerTurbo HUD
-vm.hud.label=VeinMinerTurbo
-vm.hud.on=ON
-vm.hud.off=OFF
 
 ## ===== UI =====
 veinminer.ui.title=VeinMinerTurbo Settings
@@ -47,7 +44,4 @@ veinminer.tip.not_looking=Not looking at any block
 veinminer.tip.whitelist_cleared=Whitelist cleared
 veinminer.tip.settings_error=Failed to open settings, please try again later
 
-## ===== HUD / Interaction =====
-vm.hud.toggle_on=Vein Mining: ON
-vm.hud.toggle_off=Vein Mining: OFF
 veinminer.tip.tool_low=Tool durability too low, chain stopped

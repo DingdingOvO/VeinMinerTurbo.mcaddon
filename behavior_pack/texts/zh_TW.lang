@@ -44,7 +44,4 @@ veinminer.tip.not_looking=沒有注視任何方塊
 veinminer.tip.whitelist_cleared=白名單已清空
 veinminer.tip.settings_error=設定介面開啟失敗，請稍後重試
 
-## ===== HUD / 互動 =====
-vm.hud.toggle_on=連鎖採集：開
-vm.hud.toggle_off=連鎖採集：關
 veinminer.tip.tool_low=工具耐久不足，已停止連鎖

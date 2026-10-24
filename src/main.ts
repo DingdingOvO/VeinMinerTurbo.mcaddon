@@ -7,7 +7,6 @@
  *   - /scriptevent vm:t -> 开关
  *   - /scriptevent vm:a -> 添加注视方块到白名单
  *
- * HUD 面板只负责显示状态，不承担点击回调（JSON UI 没有脚本回调通道）。
  */
 
 import {
@@ -18,7 +17,6 @@ import { registerVeinMiner } from './core';
 import { showSettings } from './ui/VeinMinerUI';
 import { getPlayerToggle, setPlayerToggle } from './config';
 import { addToWhitelist } from './ui/WhiteListManager';
-import { syncHud } from './ui/HudSync';
 import { t, tf1, tagged, rawtext, TAG } from './utils/LangHelper';
 
 /** 脚本加载标记：日志里出现这一行，说明模块已成功解析并运行 */
@@ -28,7 +26,6 @@ console.log('[VMT] VeinMinerTurbo scripts loaded');
 function toggleVeinMiner(player: Player): void {
     const next = !getPlayerToggle(player);
     setPlayerToggle(player, next);
-    syncHud(player, next);
 
     player.onScreenDisplay.setActionBar([
         rawtext(TAG + ' '),
@@ -85,7 +82,6 @@ system.afterEvents.scriptEventReceive.subscribe(
 
 system.run(() => {
     for (const player of world.getAllPlayers()) {
-        syncHud(player, getPlayerToggle(player));
         player.onScreenDisplay.setActionBar([
             rawtext(TAG + ' §a'),
             t('veinminer.tip.loaded'),
@@ -93,11 +89,4 @@ system.run(() => {
             t('veinminer.tip.sneak_mine'),
         ]);
     }
-});
-
-world.afterEvents.playerSpawn.subscribe((ev) => {
-    if (!ev.initialSpawn) return;
-    system.run(() => {
-        syncHud(ev.player, getPlayerToggle(ev.player));
-    });
 });

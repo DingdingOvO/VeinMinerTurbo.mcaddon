@@ -20,7 +20,6 @@ import {
 import {
     getWhitelist, clearWhitelist, formatWhitelist,
 } from './WhiteListManager';
-import { syncHud } from './HudSync';
 import { t, tf1, tagged } from '../utils/LangHelper';
 
 // ═══════════════════════════════════════
@@ -106,7 +105,6 @@ export async function showSettings(player: Player): Promise<void> {
 
         const nextToggle = v[IDX.TOGGLE] as boolean;
         setPlayerToggle(player, nextToggle);
-        syncHud(player, nextToggle);
 
         setPlayerMaxVein(player, v[IDX.MAX_VEIN] as number);
         setPlayerMaxDepth(player, v[IDX.MAX_DEPTH] as number);
