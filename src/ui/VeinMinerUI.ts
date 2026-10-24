@@ -16,6 +16,7 @@ import {
     getPlayerCollectDrops, setPlayerCollectDrops,
     getPlayerMaxDepth, setPlayerMaxDepth,
     getPlayerDurabilityGuard, setPlayerDurabilityGuard,
+    getPlayerOutline, setPlayerOutline,
 } from '../config';
 import {
     getWhitelist, clearWhitelist, formatWhitelist,
@@ -46,6 +47,7 @@ export async function showSettings(player: Player): Promise<void> {
         const maxVein = getPlayerMaxVein(player);
         const maxDepth = getPlayerMaxDepth(player);
         const dur = getPlayerDurabilityGuard(player);
+        const outlineOn = getPlayerOutline(player);
         const wlItems = getWhitelist(player);
 
         let collect = false;
@@ -60,9 +62,10 @@ export async function showSettings(player: Player): Promise<void> {
             MAX_VEIN: 1,
             MAX_DEPTH: 2,
             DURABILITY: 3,
-            CLEAR_WL: 4,
-            COLLECT: 5,
-            AUTO_LEAVES: 6,
+            OUTLINE: 4,
+            CLEAR_WL: 5,
+            COLLECT: 6,
+            AUTO_LEAVES: 7,
         };
 
         const form = new ModalFormData()
@@ -76,7 +79,8 @@ export async function showSettings(player: Player): Promise<void> {
                 defaultValue: maxDepth,
                 valueStep: 1,
             })
-            .toggle(t('veinminer.ui.durability_full', player), { defaultValue: dur });
+            .toggle(t('veinminer.ui.durability_full', player), { defaultValue: dur })
+            .toggle(t('veinminer.ui.outline', player), { defaultValue: outlineOn });
 
         if (wlItems.length === 0) {
             form.label(t('veinminer.ui.whitelist_label_empty', player));
@@ -109,6 +113,7 @@ export async function showSettings(player: Player): Promise<void> {
         setPlayerMaxVein(player, v[IDX.MAX_VEIN] as number);
         setPlayerMaxDepth(player, v[IDX.MAX_DEPTH] as number);
         setPlayerDurabilityGuard(player, v[IDX.DURABILITY] as boolean);
+        setPlayerOutline(player, v[IDX.OUTLINE] as boolean);
 
         if (v[IDX.CLEAR_WL] as boolean) {
             clearWhitelist(player);

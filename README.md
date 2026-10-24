@@ -13,6 +13,7 @@ Single behavior pack. No HUD, no custom items, no JSON UI, no resource pack — 
 - **Auto Leaves** — When chopping trees, optionally break nearby leaves too
 - **Drop Collection** — Teleport all drops to the break origin for easy pickup
 - **Durability Guard** — Stops the chain before the tool breaks
+- **Outline Preview** — Look at an ore vein/log and the visible surface gets a white particle outline (occlusion-tested, no x-ray)
 - **Whitelist** — Add any block to your personal mining whitelist
 - **i18n** — English, 简体中文, 繁體中文, resolved per player from `player.clientSystemInfo.locale` (no resource pack needed)
 
@@ -42,6 +43,7 @@ VeinMinerTurbo/
 │   │   ├── Scanner.ts        # BFS flood-fill scanner
 │   │   ├── BreakExecutor.ts  # Per-tick batch breaking + drop collection
 │   │   ├── TreeDetector.ts   # Leaf detection around broken logs
+│   │   ├── Outline.ts        # White particle outline preview
 │   │   └── Excavate.ts       # Excavation mode (experimental)
 │   ├── ui/
 │   │   ├── VeinMinerUI.ts    # Settings form (ModalFormData)
@@ -69,7 +71,7 @@ VeinMinerTurbo/
 ```bash
 npm install
 npm run build
-# → upload/VeinMinerTurbo-v0.3.1.mcaddon
+# → upload/VeinMinerTurbo-v0.4.0.mcaddon
 ```
 
 Set version via environment variable:
@@ -93,6 +95,7 @@ PACK_VERSION=v0.2.1 npm run build
    - Max range (1–256 blocks)
    - Max search depth (1–32)
    - Durability guard (stops before the tool breaks)
+   - Outline preview (white surface outline)
    - Clear custom whitelist
    - Drop collection (OP only)
    - Auto leaves (OP only)
