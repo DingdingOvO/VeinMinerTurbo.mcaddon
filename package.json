@@ -1,6 +1,6 @@
 {
     "name": "veinminer-addon",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Minecraft Bedrock vein mining addon",
     "type": "module",
     "scripts": {

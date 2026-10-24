@@ -2,7 +2,7 @@
 
 A high-performance vein mining addon for Minecraft Bedrock Edition. Sneak + mine to chain-break connected ores, logs, and whitelisted blocks.
 
-No HUD, no custom items, no JSON UI — everything is driven by `/scriptevent` commands.
+Single behavior pack. No HUD, no custom items, no JSON UI, no resource pack — everything is driven by `/scriptevent` commands.
 
 ## Features
 
@@ -14,7 +14,7 @@ No HUD, no custom items, no JSON UI — everything is driven by `/scriptevent` c
 - **Drop Collection** — Teleport all drops to the break origin for easy pickup
 - **Durability Guard** — Stops the chain before the tool breaks
 - **Whitelist** — Add any block to your personal mining whitelist
-- **i18n** — English, 简体中文, 繁體中文
+- **i18n** — English, 简体中文, 繁體中文, resolved per player from `player.clientSystemInfo.locale` (no resource pack needed)
 
 ## Commands
 
@@ -53,10 +53,6 @@ VeinMinerTurbo/
 │   ├── manifest.json
 │   ├── texts/
 │   └── scripts/main.js       # ← esbuild output (gitignored)
-├── resource_pack/
-│   ├── manifest.json         # Only ships .lang files (client-side translation)
-│   ├── texts/
-│   └── pack_icon.png
 ├── .github/workflows/release.yml
 ├── build.mjs
 ├── tsconfig.json
@@ -68,7 +64,7 @@ VeinMinerTurbo/
 ```bash
 npm install
 npm run build
-# → upload/VeinMinerTurbo-v0.2.0.mcaddon
+# → upload/VeinMinerTurbo-v0.3.0.mcaddon
 ```
 
 Set version via environment variable:
@@ -82,7 +78,7 @@ PACK_VERSION=v0.2.1 npm run build
 1. Download `VeinMinerTurbo-*.mcaddon` from [Releases](https://github.com/DingdingOvO/VeinMinerTurbo.mcaddon/releases)
 2. Open the `.mcaddon` file with Minecraft (or copy to device and open)
 3. In world settings, enable **Beta APIs** ("Experiments" → turn on "Beta APIs")
-4. Activate both VeinMinerTurbo **Behavior Pack** and **Resource Pack** (the resource pack only provides translations)
+4. Activate the VeinMinerTurbo **Behavior Pack** (a single pack — no resource pack required)
 
 ## Usage
 
@@ -110,7 +106,7 @@ PACK_VERSION=v0.2.1 npm run build
 - **TypeScript** + **esbuild** (ESM bundle)
 - **Bedrock Script API** — `world.beforeEvents.playerBreakBlock`, `system.afterEvents.scriptEventReceive`
 - **ModalFormData** for the settings menu
-- **`.lang` files** with `RawMessage.translate` for i18n
+- **Embedded i18n tables** selected by `player.clientSystemInfo.locale`
 - **DynamicProperties** for per-player persistent config
 
 ## License

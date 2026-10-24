@@ -24,7 +24,7 @@ import {
 } from '../config';
 import { getWhitelist } from '../ui/WhiteListManager';
 import { getHeldTool } from '../utils/ToolHelper';
-import { tf1, rawtext, TAG } from '../utils/LangHelper';
+import { t, tf1, rawtext, TAG } from '../utils/LangHelper';
 
 // ═══════════════════════════════════════
 //  注册
@@ -93,7 +93,7 @@ function handleBreak(
         if (result.timedOut) {
             player.onScreenDisplay.setActionBar([
                 rawtext(TAG + ' §e'),
-                tf1('veinminer.tip.scan_timeout_full', String(result.blocks.length)),
+                tf1('veinminer.tip.scan_timeout_full', String(result.blocks.length), player),
             ]);
             return;
         }
@@ -136,7 +136,7 @@ function limitByDurability(player: Player, blocks: Pos[]): Pos[] {
     if (usable === 0) {
         player.onScreenDisplay.setActionBar([
             rawtext(TAG + ' §c'),
-            { translate: 'veinminer.tip.tool_low' },
+            t('veinminer.tip.tool_low', player),
         ]);
         return [];
     }

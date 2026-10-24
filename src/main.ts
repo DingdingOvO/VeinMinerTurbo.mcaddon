@@ -29,7 +29,7 @@ function toggleVeinMiner(player: Player): void {
 
     player.onScreenDisplay.setActionBar([
         rawtext(TAG + ' '),
-        t(next ? 'veinminer.tip.on' : 'veinminer.tip.off'),
+        t(next ? 'veinminer.tip.on' : 'veinminer.tip.off', player),
     ]);
 }
 
@@ -62,11 +62,11 @@ system.afterEvents.scriptEventReceive.subscribe(
                     const blockName = hit.block.typeId.replace(/^minecraft:/, '');
                     entity.sendMessage(
                         added
-                            ? [rawtext(TAG + ' §a'), tf1('veinminer.tip.added', '§f' + blockName)]
-                            : [rawtext(TAG + ' §c' + blockName + ' '), t('veinminer.tip.already')],
+                            ? [rawtext(TAG + ' §a'), tf1('veinminer.tip.added', '§f' + blockName, entity)]
+                            : [rawtext(TAG + ' §c' + blockName + ' '), t('veinminer.tip.already', entity)],
                     );
                 } else {
-                    entity.sendMessage(tagged('veinminer.tip.not_looking'));
+                    entity.sendMessage(tagged('veinminer.tip.not_looking', entity));
                 }
             }
         } catch (error) {
@@ -84,9 +84,9 @@ system.run(() => {
     for (const player of world.getAllPlayers()) {
         player.onScreenDisplay.setActionBar([
             rawtext(TAG + ' §a'),
-            t('veinminer.tip.loaded'),
+            t('veinminer.tip.loaded', player),
             rawtext(' §7| §f'),
-            t('veinminer.tip.sneak_mine'),
+            t('veinminer.tip.sneak_mine', player),
         ]);
     }
 });

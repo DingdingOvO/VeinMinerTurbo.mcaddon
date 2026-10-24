@@ -66,29 +66,29 @@ export async function showSettings(player: Player): Promise<void> {
         };
 
         const form = new ModalFormData()
-            .title(t('veinminer.ui.title'))
-            .toggle(t('veinminer.ui.toggle'), { defaultValue: toggle })
-            .slider(t('veinminer.ui.max_vein'), 1, 256, {
+            .title(t('veinminer.ui.title', player))
+            .toggle(t('veinminer.ui.toggle', player), { defaultValue: toggle })
+            .slider(t('veinminer.ui.max_vein', player), 1, 256, {
                 defaultValue: maxVein,
                 valueStep: 1,
             })
-            .slider(t('veinminer.ui.max_depth'), 1, 32, {
+            .slider(t('veinminer.ui.max_depth', player), 1, 32, {
                 defaultValue: maxDepth,
                 valueStep: 1,
             })
-            .toggle(t('veinminer.ui.durability_full'), { defaultValue: dur });
+            .toggle(t('veinminer.ui.durability_full', player), { defaultValue: dur });
 
         if (wlItems.length === 0) {
-            form.label(t('veinminer.ui.whitelist_label_empty'));
+            form.label(t('veinminer.ui.whitelist_label_empty', player));
         } else {
-            form.label(tf1('veinminer.ui.whitelist_label', formatWhitelist(wlItems)));
+            form.label(tf1('veinminer.ui.whitelist_label', formatWhitelist(wlItems), player));
         }
 
-        form.toggle(t('veinminer.ui.whitelist.clear'), { defaultValue: false });
+        form.toggle(t('veinminer.ui.whitelist.clear', player), { defaultValue: false });
 
         if (op) {
-            form.toggle(t('veinminer.ui.collect_drops_full'), { defaultValue: collect });
-            form.toggle(t('veinminer.ui.auto_leaves_full'), { defaultValue: leaves });
+            form.toggle(t('veinminer.ui.collect_drops_full', player), { defaultValue: collect });
+            form.toggle(t('veinminer.ui.auto_leaves_full', player), { defaultValue: leaves });
         }
 
         const response = await form.show(player);
@@ -119,9 +119,9 @@ export async function showSettings(player: Player): Promise<void> {
             setPlayerAutoLeaves(player, v[IDX.AUTO_LEAVES] as boolean);
         }
 
-        player.sendMessage(tagged('veinminer.ui.saved'));
+        player.sendMessage(tagged('veinminer.ui.saved', player));
     } catch (error) {
         console.warn(`[VMT] settings form error: ${error}`);
-        player.sendMessage(tagged('veinminer.tip.settings_error'));
+        player.sendMessage(tagged('veinminer.tip.settings_error', player));
     }
 }

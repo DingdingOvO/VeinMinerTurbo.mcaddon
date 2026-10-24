@@ -69,7 +69,7 @@ function syncManifestVersion(manifestPath) {
 
 function syncVersions() {
     syncManifestVersion(BP_MANIFEST);
-    syncManifestVersion(RP_MANIFEST);
+    if (fs.existsSync(RP_MANIFEST)) syncManifestVersion(RP_MANIFEST);
     console.log(`  Synced version ${VERSION} to manifests`);
 }
 
@@ -83,6 +83,7 @@ const ESBUILD_OPTIONS = {
     outfile: path.join(BP_DIR, 'scripts', 'main.js'),
     format: 'esm',
     target: 'es2022',
+    charset: 'utf8',
     platform: 'neutral',
     minify: false,
     sourcemap: false,
@@ -135,13 +136,18 @@ function packagePacks() {
     console.log('  Packaging BP...');
     zipPack(BP_DIR, bpPack);
 
-    console.log('  Packaging RP...');
-    zipPack(RP_DIR, rpPack);
+    // 资源包是可选的：本项目只发行为包，翻译内嵌在脚本里
+    const files = [path.basename(bpPack)];
+    if (fs.existsSync(RP_DIR)) {
+        console.log('  Packaging RP...');
+        zipPack(RP_DIR, rpPack);
+        files.push(path.basename(rpPack));
+    }
 
     console.log('  Creating .mcaddon...');
     if (fs.existsSync(mcaddon)) fs.unlinkSync(mcaddon);
     execSync(
-        `cd "${OUTPUT_DIR}" && zip "${mcaddon}" "${path.basename(bpPack)}" "${path.basename(rpPack)}"`,
+        `cd "${OUTPUT_DIR}" && zip "${mcaddon}" ${files.map(f => `"${f}"`).join(' ')}`,
         { stdio: 'pipe' },
     );
     const kb = (fs.statSync(mcaddon).size / 1024).toFixed(1);

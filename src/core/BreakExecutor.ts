@@ -150,7 +150,7 @@ function finishPlayer(pid: string, state: QueueState | undefined): void {
 
         player.onScreenDisplay.setActionBar([
             rawtext(TAG + ' §a'),
-            tf1('veinminer.tip.broken', String(state.broken)),
+            tf1('veinminer.tip.broken', String(state.broken), player),
         ]);
 
         if (state.collectDrops && state.droppedItems.length > 0) {
