@@ -96,11 +96,15 @@ try {
                     },
                     (origin) => {
                         const src = origin.sourceEntity;
-                        if (src instanceof Player) {
-                            runAction(src, def.action);
-                            return { status: CustomCommandStatus.Success };
+                        if (!(src instanceof Player)) {
+                            return { status: CustomCommandStatus.Failure };
                         }
-                        return { status: CustomCommandStatus.Failure };
+                        // 命令回调运行在 restricted execution 模式下，
+                        // show() / setActionBar() 等原生函数在这里会抛错，必须推迟到下一 tick
+                        const player = src;
+                        const action = def.action;
+                        system.run(() => runAction(player, action));
+                        return { status: CustomCommandStatus.Success };
                     },
                 );
             } catch (error) {
