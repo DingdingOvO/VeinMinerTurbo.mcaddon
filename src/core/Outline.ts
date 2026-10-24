@@ -19,7 +19,7 @@ import { isWhitelisted, isLogType, getPlayerOutline } from '../config';
 /** 最多预览多少个方块 */
 const MAX_BLOCKS = 32;
 /** 单次最多打多少粒子，超出截断 */
-const MAX_PARTICLES = 300;
+const MAX_PARTICLES = 480;
 /** 刷新间隔（tick） */
 const INTERVAL = 6;
 /** 白色小光点（末地烛粒子，无重力、不发散） */
@@ -177,12 +177,25 @@ function isFaceVisible(
     }
 }
 
-/** 面的 4 个角 + 4 条边中点 */
+/**
+ * 面的 4 个角 + 每条边 2 个内点（1/3、2/3 处）。
+ * 点距 0.33 格，视觉上是一条连贯的白色虚线，接近 Java 版线框的节奏。
+ */
 function facePoints(x: number, y: number, z: number, face: Face): Vector3[] {
     const [a, b, c, d] = face.c.map(([dx, dy, dz]) => ({ x: x + dx, y: y + dy, z: z + dz }));
-    return [a, b, c, d, mid(a, b), mid(b, c), mid(c, d), mid(d, a)];
+    const pts: Vector3[] = [a, b, c, d];
+
+    const edges: Array<[Vector3, Vector3]> = [[a, b], [b, c], [c, d], [d, a]];
+    for (const [p, q] of edges) {
+        pts.push(lerp(p, q, 1 / 3), lerp(p, q, 2 / 3));
+    }
+    return pts;
 }
 
-function mid(p: Vector3, q: Vector3): Vector3 {
-    return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2, z: (p.z + q.z) / 2 };
+function lerp(p: Vector3, q: Vector3, t: number): Vector3 {
+    return {
+        x: p.x + (q.x - p.x) * t,
+        y: p.y + (q.y - p.y) * t,
+        z: p.z + (q.z - p.z) * t,
+    };
 }
