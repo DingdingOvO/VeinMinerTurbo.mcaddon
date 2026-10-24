@@ -47,5 +47,4 @@ veinminer.tip.settings_error=设置界面打开失败，请稍后重试
 ## ===== HUD / 交互 =====
 vm.hud.toggle_on=连锁采集：开
 vm.hud.toggle_off=连锁采集：关
-item.vm:remote.name=连锁采集遥控器
 veinminer.tip.tool_low=工具耐久不足，已停止连锁

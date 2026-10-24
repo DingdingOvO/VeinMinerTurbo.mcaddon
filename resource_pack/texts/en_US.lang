@@ -50,5 +50,4 @@ veinminer.tip.settings_error=Failed to open settings, please try again later
 ## ===== HUD / Interaction =====
 vm.hud.toggle_on=Vein Mining: ON
 vm.hud.toggle_off=Vein Mining: OFF
-item.vm:remote.name=Vein Miner Remote
 veinminer.tip.tool_low=Tool durability too low, chain stopped

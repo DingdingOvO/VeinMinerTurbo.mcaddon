@@ -1,16 +1,17 @@
 /**
  * main.ts -- VeinMinerTurbo Behavior Pack Entry
  *
- * 触发方式:
+ * 交互方式（没有物品、没有额外 UI 入口）:
  *   - 潜行 + 破坏方块 -> 连锁挖矿
- *   - 连锁采集遥控器（vm:remote）  使用 -> 开关；潜行 + 使用 -> 设置
  *   - /scriptevent vm:s -> 打开设置
  *   - /scriptevent vm:t -> 开关
  *   - /scriptevent vm:a -> 添加注视方块到白名单
+ *
+ * HUD 面板只负责显示状态，不承担点击回调（JSON UI 没有脚本回调通道）。
  */
 
 import {
-    world, system, Player, ItemStack,
+    world, system, Player,
     ScriptEventSource, ScriptEventCommandMessageAfterEvent,
 } from '@minecraft/server';
 import { registerVeinMiner } from './core';
@@ -20,7 +21,8 @@ import { addToWhitelist } from './ui/WhiteListManager';
 import { syncHud } from './ui/HudSync';
 import { t, tf1, tagged, rawtext, TAG } from './utils/LangHelper';
 
-const REMOTE_ID = 'vm:remote';
+/** 脚本加载标记：日志里出现这一行，说明模块已成功解析并运行 */
+console.log('[VMT] VeinMinerTurbo scripts loaded');
 
 /** 切换开关并广播状态 */
 function toggleVeinMiner(player: Player): void {
@@ -78,25 +80,6 @@ system.afterEvents.scriptEventReceive.subscribe(
 );
 
 // ═══════════════════════════════════════
-//  遥控器物品
-// ═══════════════════════════════════════
-
-world.afterEvents.itemUse.subscribe((ev) => {
-    try {
-        if (ev.itemStack?.typeId !== REMOTE_ID) return;
-        const player = ev.source;
-
-        if (player.isSneaking) {
-            showSettings(player);
-        } else {
-            toggleVeinMiner(player);
-        }
-    } catch (error) {
-        console.warn(`[VMT] item use error: ${error}`);
-    }
-});
-
-// ═══════════════════════════════════════
 //  进服初始化
 // ═══════════════════════════════════════
 
@@ -109,9 +92,6 @@ system.run(() => {
             rawtext(' §7| §f'),
             t('veinminer.tip.sneak_mine'),
         ]);
-
-        // 首次安装时给一个遥控器（仅当背包里没有时）
-        grantRemoteOnce(player);
     }
 });
 
@@ -119,22 +99,5 @@ world.afterEvents.playerSpawn.subscribe((ev) => {
     if (!ev.initialSpawn) return;
     system.run(() => {
         syncHud(ev.player, getPlayerToggle(ev.player));
-        grantRemoteOnce(ev.player);
     });
 });
-
-/** 背包里没有遥控器时补发一个，避免玩家找不到入口 */
-function grantRemoteOnce(player: Player): void {
-    try {
-        const inv = player.getComponent('inventory')?.container;
-        if (!inv) return;
-
-        for (let i = 0; i < inv.size; i++) {
-            if (inv.getItem(i)?.typeId === REMOTE_ID) return;
-        }
-
-        inv.addItem(new ItemStack(REMOTE_ID, 1));
-    } catch {
-        // 背包满 / 未加载，忽略
-    }
-}

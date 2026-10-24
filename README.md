@@ -11,7 +11,6 @@ A high-performance vein mining addon for Minecraft Bedrock Edition. Sneak + mine
 - **Auto Leaves** — When chopping trees, optionally break nearby leaves too
 - **Drop Collection** — Teleport all drops to the break origin for easy pickup
 - **HUD Panel** — Top-center of the right half of the screen: `连锁采集：开/关` (green/red) + a standard gear button
-- **Remote Item** — `vm:remote`, right-click to toggle, sneak + right-click to open settings
 - **Whitelist** — Add any block to your personal mining whitelist (`/scriptevent vm:a`)
 - **i18n** — English, 简体中文, 繁體中文
 - **Settings UI** — ModalFormData with sliders and toggles
@@ -20,14 +19,14 @@ A high-performance vein mining addon for Minecraft Bedrock Edition. Sneak + mine
 > Bedrock's JSON UI is declarative: it can render buttons and bind values, but it has **no callback into scripts**.
 > There is no `button_press_handlers` field in the UI schema (0 occurrences in Mojang's vanilla `hud_screen.json`).
 > The only API with a real `onClick` is `CustomForm.button()` (`@minecraft/server-ui` 2.1.0), which is a modal form — it cannot be pinned to a HUD position.
-> Therefore the HUD panel shows state, while the actual toggle is done with the **remote item** or `/scriptevent vm:t`.
+> Therefore the HUD panel only shows state; toggling and settings are done with `/scriptevent vm:t` and `/scriptevent vm:s`.
 
 ## Project Structure
 
 ```
 VeinMinerTurbo/
 ├── src/
-│   ├── main.ts              # Entry point, scriptEvent + remote item, HUD sync
+│   ├── main.ts              # Entry point, scriptEvent listeners, HUD sync
 │   ├── core/
 │   │   ├── VeinMiner.ts      # Block break event handler
 │   │   ├── Scanner.ts        # BFS flood-fill scanner
@@ -48,7 +47,6 @@ VeinMinerTurbo/
 │       └── ToolHelper.ts     # Durability check
 ├── behavior_pack/
 │   ├── manifest.json
-│   ├── items/remote.json     # vm:remote item
 │   ├── texts/
 │   └── scripts/main.js       # ← esbuild output (gitignored)
 ├── resource_pack/
@@ -57,7 +55,6 @@ VeinMinerTurbo/
 │   ├── ui/
 │   │   ├── vm_hud.json       # HUD controls (namespace: vm)
 │   │   └── vm_hud_mod.json   # Modifies hud.hud_screen (namespace: hud)
-│   ├── textures/item_texture.json
 │   ├── texts/
 │   └── pack_icon.png
 ├── .github/workflows/release.yml
@@ -98,8 +95,7 @@ PACK_VERSION=v0.1.1 npm run build
 ## Usage
 
 1. **Sneak + Mine** any ore, log, or whitelisted block to chain-break all connected blocks
-2. **Right-click the remote** (`vm:remote`) to toggle; **sneak + right-click** to open settings
-3. **`/scriptevent vm:s`** opens the settings form:
+2. **`/scriptevent vm:s`** opens the settings form:
    - Vein mining on/off
    - Max range (1–256 blocks)
    - Max search depth (1–32)
@@ -107,13 +103,13 @@ PACK_VERSION=v0.1.1 npm run build
    - Custom block whitelist (clear)
    - Drop collection (OP only)
    - Auto leaves (OP only)
-4. **`/scriptevent vm:a`** adds the block you are looking at to your whitelist
+3. **`/scriptevent vm:a`** adds the block you are looking at to your whitelist
 
 ## Requirements
 
 - Minecraft Bedrock **1.21.90+**
-- `@minecraft/server` **2.0.0**
-- `@minecraft/server-ui` **2.0.0**
+- `@minecraft/server` **2.8.0**
+- `@minecraft/server-ui` **2.1.0**
 - World setting: **Beta APIs** enabled
 
 ## Tech Stack

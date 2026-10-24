@@ -47,5 +47,4 @@ veinminer.tip.settings_error=設定介面開啟失敗，請稍後重試
 ## ===== HUD / 互動 =====
 vm.hud.toggle_on=連鎖採集：開
 vm.hud.toggle_off=連鎖採集：關
-item.vm:remote.name=連鎖採集遙控器
 veinminer.tip.tool_low=工具耐久不足，已停止連鎖
