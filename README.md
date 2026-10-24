@@ -2,7 +2,7 @@
 
 A high-performance vein mining addon for Minecraft Bedrock Edition. Sneak + mine to chain-break connected ores, logs, and whitelisted blocks.
 
-Single behavior pack. No HUD, no custom items, no JSON UI, no resource pack — everything is driven by `/scriptevent` commands.
+Single behavior pack. No HUD, no custom items, no JSON UI, no resource pack — driven by custom commands that regular members can run.
 
 ## Features
 
@@ -20,11 +20,16 @@ Single behavior pack. No HUD, no custom items, no JSON UI, no resource pack — 
 
 All commands use `/scriptevent`:
 
-| Command | Description |
-|---|---|
-| `/scriptevent vm:s` | Open settings menu |
-| `/scriptevent vm:t` | Toggle vein mining on/off |
-| `/scriptevent vm:a` | Add looked-at block to whitelist |
+| Command | Permission | Description |
+|---|---|---|
+| `/vm:menu` | Any (member) | Open settings menu |
+| `/vm:toggle` | Any (member) | Toggle vein mining on/off |
+| `/vm:add` | Any (member) | Add looked-at block to whitelist |
+| `/scriptevent vm:s` | OP | Legacy alias |
+| `/scriptevent vm:t` | OP | Legacy alias |
+| `/scriptevent vm:a` | OP | Legacy alias |
+
+Custom commands are registered with `permissionLevel: Any` and `cheatsRequired: false`, so regular members can use them without operator status.
 
 ## Project Structure
 
@@ -64,7 +69,7 @@ VeinMinerTurbo/
 ```bash
 npm install
 npm run build
-# → upload/VeinMinerTurbo-v0.3.0.mcaddon
+# → upload/VeinMinerTurbo-v0.3.1.mcaddon
 ```
 
 Set version via environment variable:
@@ -83,7 +88,7 @@ PACK_VERSION=v0.2.1 npm run build
 ## Usage
 
 1. **Sneak + Mine** any ore, log, or whitelisted block to chain-break all connected blocks
-2. **`/scriptevent vm:s`** opens the settings menu:
+2. **`/vm:menu`** opens the settings menu:
    - Vein mining on/off
    - Max range (1–256 blocks)
    - Max search depth (1–32)
@@ -91,8 +96,8 @@ PACK_VERSION=v0.2.1 npm run build
    - Clear custom whitelist
    - Drop collection (OP only)
    - Auto leaves (OP only)
-3. **`/scriptevent vm:t`** toggles vein mining
-4. **`/scriptevent vm:a`** adds the block you're looking at to your whitelist
+3. **`/vm:toggle`** toggles vein mining
+4. **`/vm:add`** adds the block you're looking at to your whitelist
 
 ## Requirements
 
