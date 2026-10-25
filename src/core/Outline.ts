@@ -19,9 +19,9 @@ import { isWhitelisted, isLogType, getPlayerOutline } from '../config';
 /** 最多预览多少个方块 */
 const MAX_BLOCKS = 32;
 /** 单次最多打多少粒子，超出截断 */
-const MAX_PARTICLES = 240;
+const MAX_PARTICLES = 400;
 /** 刷新间隔（tick） */
-const INTERVAL = 8;
+const INTERVAL = 10;
 /** 白色小十字（原地生成，不像 endrod 那样上飘） */
 const PARTICLE = 'minecraft:basic_crit_particle';
 /** 预览距离上限（格） */
@@ -183,10 +183,25 @@ function isFaceVisible(
 }
 
 /**
- * 只取面的 4 个角。
- * 角与角之间间隔 1 格，本身就是虚线的节奏，粒子数量也最少。
+ * 沿四条边按 1/3、2/3 采样，连起来是虚线。
+ * 4 个角 + 8 个内点 = 每面 12 点，点距 0.33 格。
  */
 function facePoints(x: number, y: number, z: number, face: Face): Vector3[] {
-    return face.c.map(([dx, dy, dz]) => ({ x: x + dx, y: y + dy, z: z + dz }));
+    const [a, b, c, d] = face.c.map(([dx, dy, dz]) => ({ x: x + dx, y: y + dy, z: z + dz }));
+    const pts: Vector3[] = [a, b, c, d];
+
+    const edges: Array<[Vector3, Vector3]> = [[a, b], [b, c], [c, d], [d, a]];
+    for (const [p, q] of edges) {
+        pts.push(lerp(p, q, 1 / 3), lerp(p, q, 2 / 3));
+    }
+    return pts;
+}
+
+function lerp(p: Vector3, q: Vector3, t: number): Vector3 {
+    return {
+        x: p.x + (q.x - p.x) * t,
+        y: p.y + (q.y - p.y) * t,
+        z: p.z + (q.z - p.z) * t,
+    };
 }
 
