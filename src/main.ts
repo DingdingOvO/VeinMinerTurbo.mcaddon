@@ -66,6 +66,18 @@ function runAction(player: Player, action: Action): void {
 registerVeinMiner();
 
 // ═══════════════════════════════════════
+//  命令请求队列
+// ═══════════════════════════════════════
+
+interface PendingJob {
+    playerId: string;
+    action: Action;
+}
+
+/** 命令回调只往这里塞任务，由正常 tick 消费 */
+const pendingJobs: PendingJob[] = [];
+
+// ═══════════════════════════════════════
 //  自定义命令（成员可用，不需要 OP）
 // ═══════════════════════════════════════
 
@@ -96,14 +108,20 @@ try {
                     },
                     (origin) => {
                         const src = origin.sourceEntity;
-                        if (!(src instanceof Player)) {
+                        // 不用 instanceof：脚本重载后 Player 实例可能来自旧模块，判断会失败
+                        const isPlayer = !!src && src.typeId === 'minecraft:player';
+
+                        console.warn(
+                            `[VMT] cmd=${def.name} source=${origin.sourceType} entity=${src ? src.typeId : 'none'}`,
+                        );
+
+                        if (!isPlayer || !src) {
                             return { status: CustomCommandStatus.Failure };
                         }
-                        // 命令回调运行在 restricted execution 模式下，
-                        // show() / setActionBar() 等原生函数在这里会抛错，必须推迟到下一 tick
-                        const player = src;
-                        const action = def.action;
-                        system.runTimeout(() => runAction(player, action), 1);
+
+                        // 命令回调处于 restricted execution，连 system.run / runTimeout 都可能
+                        // 继承该上下文。这里只入队，真正的执行交给下面的 tick 消费循环。
+                        pendingJobs.push({ playerId: src.id, action: def.action });
                         return { status: CustomCommandStatus.Success };
                     },
                 );
@@ -117,6 +135,29 @@ try {
     // 旧版本没有 startup / customCommandRegistry，退回 scriptevent
     console.warn(`[VMT] custom command registration unavailable: ${error}`);
 }
+
+/**
+ * 独立 tick 循环消费队列。
+ * 这个 interval 是在模块加载的常规上下文中注册的，回调绝对不在 restricted execution 里，
+ * 所以 show() / setActionBar() / playSound 都可以正常调用。
+ */
+system.runInterval(() => {
+    if (pendingJobs.length === 0) return;
+
+    const job = pendingJobs.shift();
+    if (!job) return;
+
+    const player = world.getAllPlayers().find(p => p.id === job.playerId);
+    if (!player) return;
+
+    console.warn(`[VMT] consume action=${job.action} player=${job.playerId}`);
+
+    try {
+        runAction(player, job.action);
+    } catch (error) {
+        console.warn(`[VMT] queued action failed: ${error}`);
+    }
+}, 1);
 
 // ═══════════════════════════════════════
 //  scriptEvent 监听（兼容旧接口）
