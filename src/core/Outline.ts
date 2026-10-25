@@ -19,9 +19,9 @@ import { isWhitelisted, isLogType, getPlayerOutline } from '../config';
 /** 最多预览多少个方块 */
 const MAX_BLOCKS = 32;
 /** 单次最多打多少粒子，超出截断 */
-const MAX_PARTICLES = 360;
+const MAX_PARTICLES = 240;
 /** 刷新间隔（tick） */
-const INTERVAL = 10;
+const INTERVAL = 8;
 /** 白色小十字（原地生成，不像 endrod 那样上飘） */
 const PARTICLE = 'minecraft:basic_crit_particle';
 /** 预览距离上限（格） */
@@ -121,11 +121,11 @@ function drawFor(player: Player): void {
             for (const p of facePoints(b.x, b.y, b.z, cand.face)) {
                 if (count >= MAX_PARTICLES) return;
 
-                // 沿法线外推 0.05 格：太少会被方块表面裁掉，太多会明显浮空
+                // 只外推 0.01 格，贴着方块表面，几乎不浮空
                 const out = {
-                    x: p.x + cand.face.n.x * 0.05,
-                    y: p.y + cand.face.n.y * 0.05,
-                    z: p.z + cand.face.n.z * 0.05,
+                    x: p.x + cand.face.n.x * 0.01,
+                    y: p.y + cand.face.n.y * 0.01,
+                    z: p.z + cand.face.n.z * 0.01,
                 };
 
                 const key = `${out.x.toFixed(2)},${out.y.toFixed(2)},${out.z.toFixed(2)}`;
@@ -183,18 +183,10 @@ function isFaceVisible(
 }
 
 /**
- * 面的 4 个角 + 4 条边中点。
- * 点数少、位置贴在方块边线上，画面更干净。
+ * 只取面的 4 个角。
+ * 角与角之间间隔 1 格，本身就是虚线的节奏，粒子数量也最少。
  */
 function facePoints(x: number, y: number, z: number, face: Face): Vector3[] {
-    const [a, b, c, d] = face.c.map(([dx, dy, dz]) => ({ x: x + dx, y: y + dy, z: z + dz }));
-    return [a, b, c, d, lerp(a, b, 0.5), lerp(b, c, 0.5), lerp(c, d, 0.5), lerp(d, a, 0.5)];
+    return face.c.map(([dx, dy, dz]) => ({ x: x + dx, y: y + dy, z: z + dz }));
 }
 
-function lerp(p: Vector3, q: Vector3, t: number): Vector3 {
-    return {
-        x: p.x + (q.x - p.x) * t,
-        y: p.y + (q.y - p.y) * t,
-        z: p.z + (q.z - p.z) * t,
-    };
-}
