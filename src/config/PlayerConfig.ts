@@ -105,6 +105,21 @@ export function setPlayerDurabilityGuard(p: Player, v: boolean): void {
 }
 
 // ═══════════════════════════════════════
+//  轮廓预览
+// ═══════════════════════════════════════
+
+const KEY_OUTLINE = 'veinminer_outline';
+
+/** 是否显示方块轮廓预览，默认开启 */
+export function getPlayerOutline(p: Player): boolean {
+    return p.getDynamicProperty(KEY_OUTLINE) !== false;
+}
+
+export function setPlayerOutline(p: Player, v: boolean): void {
+    p.setDynamicProperty(KEY_OUTLINE, v);
+}
+
+// ═══════════════════════════════════════
 //  3×3×3 挖掘（预留）
 // ═══════════════════════════════════════
 

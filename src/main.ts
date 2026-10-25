@@ -15,6 +15,7 @@ import {
     ScriptEventSource, ScriptEventCommandMessageAfterEvent,
 } from '@minecraft/server';
 import { registerVeinMiner } from './core';
+import { startOutlineLoop } from './core/Outline';
 import { showSettings } from './ui/VeinMinerUI';
 import { getPlayerToggle, setPlayerToggle } from './config';
 import { addToWhitelist } from './ui/WhiteListManager';
@@ -64,6 +65,7 @@ function runAction(player: Player, action: Action): void {
 }
 
 registerVeinMiner();
+startOutlineLoop();
 
 // ═══════════════════════════════════════
 //  命令请求队列
