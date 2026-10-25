@@ -21,7 +21,7 @@ const MAX_BLOCKS = 32;
 /** 单次最多打多少粒子，超出截断 */
 const MAX_PARTICLES = 360;
 /** 刷新间隔（tick） */
-const INTERVAL = 8;
+const INTERVAL = 10;
 /** 白色小十字（原地生成，不像 endrod 那样上飘） */
 const PARTICLE = 'minecraft:basic_crit_particle';
 /** 预览距离上限（格） */
@@ -121,11 +121,11 @@ function drawFor(player: Player): void {
             for (const p of facePoints(b.x, b.y, b.z, cand.face)) {
                 if (count >= MAX_PARTICLES) return;
 
-                // 沿法线外推 0.02 格，避免粒子被方块表面裁掉（看起来更贴边）
+                // 沿法线外推 0.05 格：太少会被方块表面裁掉，太多会明显浮空
                 const out = {
-                    x: p.x + cand.face.n.x * 0.02,
-                    y: p.y + cand.face.n.y * 0.02,
-                    z: p.z + cand.face.n.z * 0.02,
+                    x: p.x + cand.face.n.x * 0.05,
+                    y: p.y + cand.face.n.y * 0.05,
+                    z: p.z + cand.face.n.z * 0.05,
                 };
 
                 const key = `${out.x.toFixed(2)},${out.y.toFixed(2)},${out.z.toFixed(2)}`;
