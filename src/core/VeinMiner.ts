@@ -12,7 +12,7 @@
  * 起点方块由玩家自己破坏，下一 tick 已是空气也没关系 —— bfsScan 的起点不校验类型。
  */
 
-import { world, system, Player, Dimension, PlayerBreakBlockBeforeEvent, Vector3 } from '@minecraft/server';
+import { world, system, Player, Dimension, GameMode, PlayerBreakBlockBeforeEvent, Vector3 } from '@minecraft/server';
 import { bfsScan, Pos } from './Scanner';
 import { scanLeaves } from './TreeDetector';
 import { executeBreak } from './BreakExecutor';
@@ -74,6 +74,13 @@ function handleBreak(
     try {
         // 玩家可能已经退出
         if (!player.isValid) return;
+
+        // 创造模式：方块是瞬间破坏且不掉落，连锁没有意义，直接跳过
+        try {
+            if (player.getGameMode() === GameMode.Creative) return;
+        } catch {
+            // 读取失败时按生存处理
+        }
 
         // 白名单 / 黑名单（含玩家自定义白名单）
         if (isBlacklisted(typeId)) return;

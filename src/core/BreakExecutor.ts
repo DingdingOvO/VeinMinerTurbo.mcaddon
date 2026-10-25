@@ -100,6 +100,7 @@ function processTick(pid: string): void {
     }
 
     const batch = state.blocks.splice(0, BATCH_SIZE);
+    let playedSound = false;
 
     for (const pos of batch) {
         try {
@@ -115,6 +116,20 @@ function processTick(pid: string): void {
 
             // 先清空方块，再生成掉落物，避免掉落物被方块顶出
             block.setType('minecraft:air');
+
+            // 挖掘反馈：扬尘 + 音效
+            // 注：Bedrock 的 block_destruct 粒子需要方块纹理上下文，spawnParticle 给不了，
+            //     所以这里用通用扬尘 + 对应材质的挖掘音效来还原手感
+            try {
+                const center = { x: pos.x + 0.5, y: pos.y + 0.5, z: pos.z + 0.5 };
+                state.dimension.spawnParticle('minecraft:basic_smoke_particle', center);
+                if (!playedSound) {
+                    state.dimension.playSound(breakSound(blockId), center, { volume: 0.55 });
+                    playedSound = true;
+                }
+            } catch {
+                // 音效/粒子不可用，忽略
+            }
 
             const entities = spawnDrops(state.dimension, pos, drops, exp);
             if (state.collectDrops && entities.length > 0) {
@@ -159,6 +174,24 @@ function finishPlayer(pid: string, state: QueueState | undefined): void {
     } catch (error) {
         console.warn(`[VMT] finish callback error: ${error}`);
     }
+}
+
+// ═══════════════════════════════════════
+//  材质音效映射
+// ═══════════════════════════════════════
+
+/** 按方块 ID 猜测挖掘音效，矿石类统一用 dig.stone */
+function breakSound(blockId: string): string {
+    const id = blockId.replace('minecraft:', '');
+    if (id.includes('log') || id.includes('stem') || id.includes('planks') || id.includes('wood')) {
+        return 'dig.wood';
+    }
+    if (id.includes('leaves')) return 'dig.grass';
+    if (id.includes('gravel')) return 'dig.gravel';
+    if (id.includes('sand')) return 'dig.sand';
+    if (id.includes('glass')) return 'dig.glass';
+    if (id.includes('wool')) return 'dig.cloth';
+    return 'dig.stone';
 }
 
 // ═══════════════════════════════════════

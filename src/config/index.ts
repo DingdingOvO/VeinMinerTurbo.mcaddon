@@ -17,6 +17,5 @@ export {
     getPlayerCollectDrops, setPlayerCollectDrops,
     getPlayerMaxDepth, setPlayerMaxDepth,
     getPlayerDurabilityGuard, setPlayerDurabilityGuard,
-    getPlayerOutline, setPlayerOutline,
     getPlayerExcavate, setPlayerExcavate,
 } from './PlayerConfig';
