@@ -22,8 +22,8 @@ const MAX_BLOCKS = 32;
 const MAX_PARTICLES = 400;
 /** 刷新间隔（tick） */
 const INTERVAL = 10;
-/** 白色小十字（原地生成，不像 endrod 那样上飘） */
-const PARTICLE = 'minecraft:basic_crit_particle';
+/** 黑曜石微尘：极小的紫色光点，不爆散 */
+const PARTICLE = 'minecraft:obsidian_glow_dust_particle';
 /** 预览距离上限（格） */
 const MAX_DISTANCE = 8;
 /** 每个方块最多检测几个面（按朝向排序取前 N，控制射线数量） */
