@@ -17,6 +17,8 @@ import {
     getPlayerMaxDepth, setPlayerMaxDepth,
     getPlayerDurabilityGuard, setPlayerDurabilityGuard,
     getPlayerOutline, setPlayerOutline,
+    getPlayerCubeSize, setPlayerCubeSize,
+    CUBE_SIZE_MIN, CUBE_SIZE_MAX,
 } from '../config';
 import {
     getWhitelist, clearWhitelist, formatWhitelist,
@@ -57,15 +59,20 @@ export async function showSettings(player: Player): Promise<void> {
             leaves = getPlayerAutoLeaves(player);
         }
 
+        const size = getPlayerCubeSize(player);
+
         const IDX = {
             TOGGLE: 0,
             MAX_VEIN: 1,
-            MAX_DEPTH: 2,
-            DURABILITY: 3,
-            OUTLINE: 4,
-            CLEAR_WL: 5,
-            COLLECT: 6,
-            AUTO_LEAVES: 7,
+            SIZE_X: 2,
+            SIZE_Y: 3,
+            SIZE_Z: 4,
+            MAX_DEPTH: 5,
+            DURABILITY: 6,
+            OUTLINE: 7,
+            CLEAR_WL: 8,
+            COLLECT: 9,
+            AUTO_LEAVES: 10,
         };
 
         const form = new ModalFormData()
@@ -73,6 +80,18 @@ export async function showSettings(player: Player): Promise<void> {
             .toggle(t('veinminer.ui.toggle', player), { defaultValue: toggle })
             .slider(t('veinminer.ui.max_vein', player), 1, 256, {
                 defaultValue: maxVein,
+                valueStep: 1,
+            })
+            .slider(t('veinminer.ui.size_x', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
+                defaultValue: size.x,
+                valueStep: 1,
+            })
+            .slider(t('veinminer.ui.size_y', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
+                defaultValue: size.y,
+                valueStep: 1,
+            })
+            .slider(t('veinminer.ui.size_z', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
+                defaultValue: size.z,
                 valueStep: 1,
             })
             .slider(t('veinminer.ui.max_depth', player), 1, 32, {
@@ -111,6 +130,11 @@ export async function showSettings(player: Player): Promise<void> {
         setPlayerToggle(player, nextToggle);
 
         setPlayerMaxVein(player, v[IDX.MAX_VEIN] as number);
+        setPlayerCubeSize(player, {
+            x: v[IDX.SIZE_X] as number,
+            y: v[IDX.SIZE_Y] as number,
+            z: v[IDX.SIZE_Z] as number,
+        });
         setPlayerMaxDepth(player, v[IDX.MAX_DEPTH] as number);
         setPlayerDurabilityGuard(player, v[IDX.DURABILITY] as boolean);
         setPlayerOutline(player, v[IDX.OUTLINE] as boolean);

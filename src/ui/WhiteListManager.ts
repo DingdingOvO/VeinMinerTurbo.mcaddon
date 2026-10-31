@@ -5,6 +5,7 @@
  */
 
 import { Player } from '@minecraft/server';
+import { blockName } from '../utils/BlockNames';
 
 const WHITELIST_KEY = 'veinminer_whitelist';
 const MAX_SIZE = 64;
@@ -61,5 +62,5 @@ export function clearWhitelist(player: Player): void {
 
 export function formatWhitelist(items: string[]): string {
     if (items.length === 0) return '';
-    return items.map(id => id.replace(/^minecraft:/, '')).join(', ');
+    return items.map(id => blockName(id)).join('、');
 }

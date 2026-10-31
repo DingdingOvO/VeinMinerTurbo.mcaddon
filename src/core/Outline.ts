@@ -13,8 +13,9 @@
  */
 
 import { world, system, Player, Dimension, Vector3 } from '@minecraft/server';
-import { bfsScan } from './Scanner';
+import { bfsScan, Pos } from './Scanner';
 import { isWhitelisted, isLogType, getPlayerOutline } from '../config';
+import { getWhitelist } from '../ui/WhiteListManager';
 
 /** 最多预览多少个方块 */
 const MAX_BLOCKS = 32;
@@ -48,8 +49,7 @@ export function startOutlineLoop(): void {
     system.runInterval(() => {
         for (const player of world.getAllPlayers()) {
             try {
-                if (!getPlayerOutline(player)) continue;
-                drawFor(player);
+                tickPlayer(player);
             } catch {
                 // 玩家切换维度 / 退出，忽略
             }
@@ -57,12 +57,18 @@ export function startOutlineLoop(): void {
     }, INTERVAL);
 }
 
-function drawFor(player: Player): void {
+/**
+ * 每个刷新周期：只在描边开启时画粒子轮廓。
+ * 动作栏不加任何提示。
+ */
+function tickPlayer(player: Player): void {
+    if (!getPlayerOutline(player)) return;
+
     const hit = player.getBlockFromViewDirection({ maxDistance: MAX_DISTANCE });
     if (!hit || !hit.block) return;
 
     const typeId = hit.block.typeId;
-    if (!isWhitelisted(typeId)) return;
+    if (!isWhitelisted(typeId) && !getWhitelist(player).includes(typeId)) return;
 
     const dimension = hit.block.dimension;
     const origin: Vector3 = {
@@ -75,11 +81,15 @@ function drawFor(player: Player): void {
     const scan = bfsScan(dimension, origin, typeId, MAX_BLOCKS, 30, isLogType(typeId), 8);
     if (scan.blocks.length === 0) return;
 
+    drawBlocks(player, dimension, scan.blocks, typeId);
+}
+
+function drawBlocks(player: Player, dimension: Dimension, blocks: Pos[], typeId: string): void {
     const eye = player.getHeadLocation();
     const drawn = new Set<string>();
     let count = 0;
 
-    for (const b of scan.blocks) {
+    for (const b of blocks) {
         // 先挑出"朝向我且不在矿脉内部"的面，按正对程度排序
         const candidates: Array<{ face: Face; score: number; center: Vector3 }> = [];
 

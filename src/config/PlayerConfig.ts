@@ -5,7 +5,7 @@
  */
 
 import { Player } from '@minecraft/server';
-import { DEFAULT_MAX_VEIN } from './Constants';
+import { DEFAULT_MAX_VEIN, DEFAULT_CUBE_SIZE, CUBE_SIZE_MIN, CUBE_SIZE_MAX } from './Constants';
 
 // ═══════════════════════════════════════
 //  DynamicProperty key 常量
@@ -120,7 +120,7 @@ export function setPlayerOutline(p: Player, v: boolean): void {
 }
 
 // ═══════════════════════════════════════
-//  3×3×3 挖掘（预留）
+//  3×3×3 挖掘（普通方块白名单）
 // ═══════════════════════════════════════
 
 /** 获取3×3×3挖掘开关，默认关闭 */
@@ -131,4 +131,45 @@ export function getPlayerExcavate(p: Player): boolean {
 
 export function setPlayerExcavate(p: Player, v: boolean): void {
     p.setDynamicProperty(KEY_EXCAVATE, v);
+}
+
+// ═══════════════════════════════════════
+//  立方体尺寸（白名单普通方块，长/宽/高）
+// ═══════════════════════════════════════
+
+const KEY_SIZE_X = 'vm:size_x';
+const KEY_SIZE_Y = 'vm:size_y';
+const KEY_SIZE_Z = 'vm:size_z';
+
+export interface CubeSize {
+    /** 长（X 轴） */
+    x: number;
+    /** 高（Y 轴） */
+    y: number;
+    /** 宽（Z 轴） */
+    z: number;
+}
+
+function readSize(p: Player, key: string): number {
+    const v = p.getDynamicProperty(key);
+    const n = typeof v === 'number' ? v : DEFAULT_CUBE_SIZE;
+    return Math.min(CUBE_SIZE_MAX, Math.max(CUBE_SIZE_MIN, Math.floor(n)));
+}
+
+/** 获取立方体尺寸，默认 3×3×3 */
+export function getPlayerCubeSize(p: Player): CubeSize {
+    return {
+        x: readSize(p, KEY_SIZE_X),
+        y: readSize(p, KEY_SIZE_Y),
+        z: readSize(p, KEY_SIZE_Z),
+    };
+}
+
+export function setPlayerCubeSize(p: Player, size: Partial<CubeSize>): void {
+    const clamp = (n: number): number =>
+        Math.min(CUBE_SIZE_MAX, Math.max(CUBE_SIZE_MIN, Math.floor(n)));
+
+    if (typeof size.x === 'number') p.setDynamicProperty(KEY_SIZE_X, clamp(size.x));
+    if (typeof size.y === 'number') p.setDynamicProperty(KEY_SIZE_Y, clamp(size.y));
+    if (typeof size.z === 'number') p.setDynamicProperty(KEY_SIZE_Z, clamp(size.z));
 }
