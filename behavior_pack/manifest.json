@@ -1,5 +1,12 @@
 {
     "format_version": 2,
+    "metadata": {
+        "product_type": "addon",
+        "authors": [
+            "DingdingOvO"
+        ],
+        "license": "MIT"
+    },
     "header": {
         "name": "VeinMinerTurbo",
         "description": "Sneak+Mine vein mining. /vm:menu for settings.",
@@ -7,7 +14,7 @@
         "version": [
             0,
             8,
-            6
+            7
         ],
         "min_engine_version": [
             1,
@@ -23,7 +30,7 @@
             "version": [
                 0,
                 8,
-                6
+                7
             ],
             "entry": "scripts/main.js"
         }
