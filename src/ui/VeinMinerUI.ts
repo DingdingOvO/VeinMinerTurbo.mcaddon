@@ -85,14 +85,17 @@ export async function showSettings(player: Player): Promise<void> {
             .slider(t('veinminer.ui.size_x', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
                 defaultValue: size.x,
                 valueStep: 1,
+                tooltip: t('veinminer.ui.size_x_tip', player),
             })
             .slider(t('veinminer.ui.size_y', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
                 defaultValue: size.y,
                 valueStep: 1,
+                tooltip: t('veinminer.ui.size_y_tip', player),
             })
             .slider(t('veinminer.ui.size_z', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
                 defaultValue: size.z,
                 valueStep: 1,
+                tooltip: t('veinminer.ui.size_z_tip', player),
             })
             .slider(t('veinminer.ui.max_depth', player), 1, 32, {
                 defaultValue: maxDepth,
