@@ -23,7 +23,11 @@ import { registerCommands, startCommandQueue } from './commands/registry';
 console.log('[VMT] VeinMinerTurbo scripts loaded');
 
 // 旧版本键名迁移（只搬一次，之后新键已有值就不会再动）
-migrateAll();
+// 不能在脚本顶层跑：那时是世界加载前的 early execution，world API 会直接抛错，
+// 一抛错整个 main.js 就终止，后面的命令注册、事件订阅全都不会执行。
+world.afterEvents.worldLoad.subscribe(() => {
+    migrateAll();
+});
 world.afterEvents.playerSpawn.subscribe((ev) => {
     if (!ev.initialSpawn) return;
     migratePlayerProperties(ev.player);
