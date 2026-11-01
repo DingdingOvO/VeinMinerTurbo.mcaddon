@@ -1,9 +1,10 @@
 /**
  * Menu.ts — 设置菜单
  *
- * 结构：首页是 ActionFormData（按钮可带图标），点进去是分组小表单。
- * 为什么不用一个大 ModalFormData：滑条一多视觉上就是一堵墙，
- * 分组后每页只放 2~4 个控件，读起来清楚。
+ * 三块：
+ *   1. 首页：ActionFormData，按钮带原版图标（镐子 / 齿轮 / 书本 / 对勾）
+ *   2. 设置：交给 Ddui.ts 用 CustomForm 排版；那条路走不通时退回一页式 ModalFormData
+ *   3. 白名单：一行一个方块，左边物品图标，右边 ✕
  *
  * 图标全部用原版贴图 textures/ui/xxx，不需要额外资源包。
  */
@@ -20,19 +21,18 @@ import {
     getPlayerOutline, setPlayerOutline,
     getPlayerCubeSize, setPlayerCubeSize,
     CUBE_SIZE_MIN, CUBE_SIZE_MAX,
+    HARD_MAX_VEIN,
 } from '../config';
 import { getWhitelist, clearWhitelist, removeFromWhitelist } from '../data/Whitelist';
 import { blockName } from '../data/BlockNames';
 import { blockIcon } from '../data/BlockIcons';
 import { t, tagged } from '../utils/LangHelper';
+import { showSettingsDdui } from './Ddui';
 
 /** 原版 UI 贴图（全部核对过文件存在，写错路径会显示不出图标） */
 const ICON = {
     pickaxe: 'textures/ui/icon_iron_pickaxe',
-    general: 'textures/ui/gear',
-    range: 'textures/ui/icon_recipe_construction',
-    behavior: 'textures/ui/icon_recipe_item',
-    visual: 'textures/ui/icon_recipe_equipment',
+    settings: 'textures/ui/gear',
     whitelist: 'textures/ui/icon_book_writable',
     trash: 'textures/ui/icon_trash',
     close: 'textures/ui/check',
@@ -57,18 +57,15 @@ export async function showMainMenu(player: Player): Promise<void> {
     const form = new ActionFormData()
         .title(t('veinminer.ui.menu.title', player))
         .body([
-            `§7潜行 §7+ §7挖掘 = 连锁采集`,
+            '§8潜行 + 挖掘  触发连锁',
             '',
-            `${on ? '§a已开启' : '§c已关闭'}  §8|  §7范围 §f${size.x}×${size.y}×${size.z}`,
-            `§7白名单 §f${wl} §7种`,
+            `§7状态  ${on ? '§a已开启' : '§c已关闭'}`,
+            `§7范围  §f${size.x}×${size.y}×${size.z}    §7白名单  §f${wl} 种`,
         ].join('\n'));
 
-    form.button(`${on ? '§a' : '§c'}连锁采集  §7${on ? '已开启 · 点击关闭' : '已关闭 · 点击开启'}`, ICON.pickaxe);
-    form.button('§f基础设置\n§8最大连锁 · 深度 · 耐久保护', ICON.general);
-    form.button('§f挖掘范围\n§8长 · 高 · 宽', ICON.range);
-    form.button('§f采集行为\n§8掉落物 · 树叶', ICON.behavior);
-    form.button('§f显示与特效\n§8轮廓描边', ICON.visual);
-    form.button(`§f白名单 §7(${wl})\n§8查看与清空`, ICON.whitelist);
+    form.button(`${on ? '§a' : '§c'}连锁采集  §7${on ? '已开启' : '已关闭'}`, ICON.pickaxe);
+    form.button('§f设置\n§8范围 · 上限 · 行为 · 描边', ICON.settings);
+    form.button(`§f白名单 §7(${wl})\n§8查看与删除`, ICON.whitelist);
     form.button('§8关闭', ICON.close);
 
     const res = await form.show(player);
@@ -82,59 +79,45 @@ export async function showMainMenu(player: Player): Promise<void> {
             reopen(player, showMainMenu);
             return;
         }
-        case 1: return reopen(player, showGeneral);
-        case 2: return reopen(player, showRange);
-        case 3: return reopen(player, showBehavior);
-        case 4: return reopen(player, showVisual);
-        case 5: return reopen(player, showWhitelistPage);
+        case 1: {
+            // 优先用 DDUI 排版；不可用时退回老的一页式表单
+            const done = await showSettingsDdui(player);
+            if (!done) reopen(player, showSettingsFallback);
+            return;
+        }
+        case 2: return reopen(player, showWhitelistPage);
         default: return;
     }
 }
 
 // ═══════════════════════════════════════
-//  基础设置
+//  设置（降级版：CustomForm 不可用时才用）
 // ═══════════════════════════════════════
 
-async function showGeneral(player: Player): Promise<void> {
+async function showSettingsFallback(player: Player): Promise<void> {
+    const size = getPlayerCubeSize(player);
+
     const res = await new ModalFormData()
-        .title(t('veinminer.ui.general.title', player))
-        .slider(t('veinminer.ui.max_vein', player), 1, 256, {
+        .title(t('veinminer.ui.title', player))
+        .slider(t('veinminer.ui.size_x', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
+            defaultValue: size.x, valueStep: 1,
+        })
+        .slider(t('veinminer.ui.size_y', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
+            defaultValue: size.y, valueStep: 1,
+        })
+        .slider(t('veinminer.ui.size_z', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
+            defaultValue: size.z, valueStep: 1,
+        })
+        .slider(t('veinminer.ui.max_vein', player), 1, HARD_MAX_VEIN, {
             defaultValue: getPlayerMaxVein(player), valueStep: 1,
         })
         .slider(t('veinminer.ui.max_depth', player), 1, 32, {
             defaultValue: getPlayerMaxDepth(player), valueStep: 1,
         })
         .toggle(t('veinminer.ui.durability_full', player), { defaultValue: getPlayerDurabilityGuard(player) })
-        .submitButton(t('veinminer.ui.back', player))
-        .show(player);
-
-    if (res.canceled || !res.formValues) return;
-
-    setPlayerMaxVein(player, res.formValues[0] as number);
-    setPlayerMaxDepth(player, res.formValues[1] as number);
-    setPlayerDurabilityGuard(player, res.formValues[2] as boolean);
-    player.sendMessage(tagged('veinminer.ui.saved', player));
-    reopen(player, showMainMenu);
-}
-
-// ═══════════════════════════════════════
-//  挖掘范围
-// ═══════════════════════════════════════
-
-async function showRange(player: Player): Promise<void> {
-    const size = getPlayerCubeSize(player);
-
-    const res = await new ModalFormData()
-        .title(t('veinminer.ui.range.title', player))
-        .slider(t('veinminer.ui.size_x', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
-            defaultValue: size.x, valueStep: 1, tooltip: t('veinminer.ui.size_x_tip', player),
-        })
-        .slider(t('veinminer.ui.size_y', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
-            defaultValue: size.y, valueStep: 1, tooltip: t('veinminer.ui.size_y_tip', player),
-        })
-        .slider(t('veinminer.ui.size_z', player), CUBE_SIZE_MIN, CUBE_SIZE_MAX, {
-            defaultValue: size.z, valueStep: 1, tooltip: t('veinminer.ui.size_z_tip', player),
-        })
+        .toggle(t('veinminer.ui.collect_drops_full', player), { defaultValue: getPlayerCollectDrops(player) })
+        .toggle(t('veinminer.ui.auto_leaves_full', player), { defaultValue: getPlayerAutoLeaves(player) })
+        .toggle(t('veinminer.ui.outline', player), { defaultValue: getPlayerOutline(player) })
         .submitButton(t('veinminer.ui.back', player))
         .show(player);
 
@@ -145,44 +128,13 @@ async function showRange(player: Player): Promise<void> {
         y: res.formValues[1] as number,
         z: res.formValues[2] as number,
     });
-    player.sendMessage(tagged('veinminer.ui.saved', player));
-    reopen(player, showMainMenu);
-}
+    setPlayerMaxVein(player, res.formValues[3] as number);
+    setPlayerMaxDepth(player, res.formValues[4] as number);
+    setPlayerDurabilityGuard(player, res.formValues[5] as boolean);
+    setPlayerCollectDrops(player, res.formValues[6] as boolean);
+    setPlayerAutoLeaves(player, res.formValues[7] as boolean);
+    setPlayerOutline(player, res.formValues[8] as boolean);
 
-// ═══════════════════════════════════════
-//  采集行为
-// ═══════════════════════════════════════
-
-async function showBehavior(player: Player): Promise<void> {
-    const res = await new ModalFormData()
-        .title(t('veinminer.ui.behavior.title', player))
-        .toggle(t('veinminer.ui.collect_drops_full', player), { defaultValue: getPlayerCollectDrops(player) })
-        .toggle(t('veinminer.ui.auto_leaves_full', player), { defaultValue: getPlayerAutoLeaves(player) })
-        .submitButton(t('veinminer.ui.back', player))
-        .show(player);
-
-    if (res.canceled || !res.formValues) return;
-
-    setPlayerCollectDrops(player, res.formValues[0] as boolean);
-    setPlayerAutoLeaves(player, res.formValues[1] as boolean);
-    player.sendMessage(tagged('veinminer.ui.saved', player));
-    reopen(player, showMainMenu);
-}
-
-// ═══════════════════════════════════════
-//  显示与特效
-// ═══════════════════════════════════════
-
-async function showVisual(player: Player): Promise<void> {
-    const res = await new ModalFormData()
-        .title(t('veinminer.ui.visual.title', player))
-        .toggle(t('veinminer.ui.outline', player), { defaultValue: getPlayerOutline(player) })
-        .submitButton(t('veinminer.ui.back', player))
-        .show(player);
-
-    if (res.canceled || !res.formValues) return;
-
-    setPlayerOutline(player, res.formValues[0] as boolean);
     player.sendMessage(tagged('veinminer.ui.saved', player));
     reopen(player, showMainMenu);
 }
