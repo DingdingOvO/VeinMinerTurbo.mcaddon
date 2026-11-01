@@ -15,6 +15,7 @@ export {
     DEFAULT_MAX_VEIN, HARD_MAX_VEIN, SLIDER_MIN, SLIDER_MAX,
     SCAN_TIMEOUT_MS, LEAF_SCAN_RADIUS, LEAF_MAX_COUNT,
     DEFAULT_CUBE_SIZE, CUBE_SIZE_MIN, CUBE_SIZE_MAX,
+    BLOCKS_PER_WEAR,
 } from './Constants';
 export {
     getPlayerToggle, setPlayerToggle,

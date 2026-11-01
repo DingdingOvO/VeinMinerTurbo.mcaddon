@@ -13,16 +13,10 @@
 import { world, system, Player, Dimension, Vector3, Entity, EquipmentSlot } from '@minecraft/server';
 import { Pos, sortByDistance } from './Scanner';
 import { getDrops, getExperience, spawnDrops } from '../utils/EnchantmentHelper';
-import { tf1, rawtext, TAG } from '../utils/LangHelper';
+import { tf1, tf2, rawtext, TAG } from '../utils/LangHelper';
+import { BLOCKS_PER_WEAR } from '../config/Constants';
 
 const BATCH_SIZE = 20;
-
-/**
- * 连锁每破坏多少块，扣 1 点工具耐久。
- * 4 = 打四折：一次 64 块的连锁扣 16 点，铁镐能用十几轮，手感不至于太亏。
- * 起点那块由原版扣 1 点，这里只算连锁的部分。
- */
-const BLOCKS_PER_WEAR = 4;
 
 // ═══════════════════════════════════════
 //  类型
@@ -37,6 +31,14 @@ interface QueueState {
     dimension: Dimension;
     /** 本次连锁产生的掉落物实体引用 */
     droppedItems: Entity[];
+    /** 因耐久不足被截断时的信息（无截断则为 undefined） */
+    cut?: DurabilityCut;
+}
+
+/** 耐久不足导致连锁提前结束：实际能挖多少 / 本来要挖多少 */
+export interface DurabilityCut {
+    kept: number;
+    wanted: number;
 }
 
 /** playerId → 该玩家的破坏队列 */
@@ -57,6 +59,7 @@ export function executeBreak(
     leafBlocks: Pos[],
     origin: Vector3,
     collectDrops: boolean,
+    cut?: DurabilityCut,
 ): void {
     const pid = player.id;
     const sorted = sortByDistance(blocks, origin);
@@ -70,6 +73,7 @@ export function executeBreak(
         existing.origin = origin;
         existing.collectDrops = collectDrops;
         existing.dimension = dimension;
+        existing.cut = cut;
         return;
     }
 
@@ -81,6 +85,7 @@ export function executeBreak(
         collectDrops,
         dimension,
         droppedItems: [],
+        cut,
     });
 
     processTick(pid);
@@ -157,10 +162,17 @@ function finishPlayer(pid: string, state: QueueState | undefined): void {
 
         wearTool(player, state.broken);
 
-        player.onScreenDisplay.setActionBar([
-            rawtext(TAG + ' §a'),
-            tf1('veinminer.tip.broken', String(state.broken), player),
-        ]);
+        player.onScreenDisplay.setActionBar(
+            state.cut
+                ? [
+                    rawtext(TAG + ' §c'),
+                    tf2('veinminer.tip.durability_cut', String(state.cut.kept), String(state.cut.wanted), player),
+                ]
+                : [
+                    rawtext(TAG + ' §a'),
+                    tf1('veinminer.tip.broken', String(state.broken), player),
+                ],
+        );
 
         if (state.collectDrops && state.droppedItems.length > 0) {
             collectDropsToOrigin(state.origin, state.droppedItems);

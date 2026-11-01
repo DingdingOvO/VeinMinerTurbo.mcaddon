@@ -21,12 +21,12 @@ import { world, system, Player, Dimension, GameMode, PlayerBreakBlockBeforeEvent
 import { bfsScan, Pos } from './Scanner';
 import { scanLeaves } from './TreeDetector';
 import { scanCube } from './Excavate';
-import { executeBreak } from './BreakExecutor';
+import { executeBreak, DurabilityCut } from './BreakExecutor';
 import {
     getMineMode, isLogType, getLeafIdSet,
     getPlayerToggle, getPlayerMaxVein, getPlayerAutoLeaves, getPlayerCollectDrops,
     getPlayerMaxDepth, getPlayerDurabilityGuard, getPlayerCubeSize,
-    SCAN_TIMEOUT_MS,
+    SCAN_TIMEOUT_MS, BLOCKS_PER_WEAR,
 } from '../config';
 import { getWhitelist } from '../ui/WhiteListManager';
 import { isPlayerBanned } from '../config/PlayerBlacklist';
@@ -150,8 +150,22 @@ function handleBreak(
         let extraBlocks: Pos[] = blocks.length > 1 ? blocks.slice(1) : [];
 
         // 耐久保护：剩余耐久不足时截断，避免连锁把工具一次打爆
+        let cut: DurabilityCut | undefined;
         if (extraBlocks.length > 0 && getPlayerDurabilityGuard(player)) {
+            const wanted = extraBlocks.length;
             extraBlocks = limitByDurability(player, extraBlocks);
+
+            if (extraBlocks.length < wanted) {
+                if (extraBlocks.length === 0) {
+                    // 一点余量都没有，直接拦下
+                    player.onScreenDisplay.setActionBar([
+                        rawtext(TAG + ' §c'),
+                        t('veinminer.tip.tool_low', player),
+                    ]);
+                    return;
+                }
+                cut = { kept: extraBlocks.length, wanted };
+            }
         }
 
         // 自动破叶（只有整棵树才做）
@@ -163,7 +177,7 @@ function handleBreak(
         if (extraBlocks.length === 0 && leafBlocks.length === 0) return;
 
         const collectDrops = getPlayerCollectDrops(player);
-        executeBreak(player, dimension, extraBlocks, leafBlocks, startLoc, collectDrops);
+        executeBreak(player, dimension, extraBlocks, leafBlocks, startLoc, collectDrops, cut);
     } catch (error) {
         console.warn(`[VMT] handleBreak error: ${error}`);
     }
@@ -171,22 +185,18 @@ function handleBreak(
 
 /**
  * 按工具剩余耐久截断连锁列表
- * 每个方块消耗 1 点耐久，留 1 点保底（防止工具直接碎掉）
+ *
+ * 跟扣耐久的账一致：每 BLOCKS_PER_WEAR 块才扣 1 点，
+ * 所以 1 点余量能支撑 BLOCKS_PER_WEAR 块，而不是 1 块。
+ * 另外留 1 点保底，防止工具被连锁打碎。
  */
 function limitByDurability(player: Player, blocks: Pos[]): Pos[] {
     const tool = getHeldTool(player);
     if (!tool.durability) return blocks; // 无耐久条（创造 / 空手）→ 不限制
 
     const remain = tool.durability.maxDurability - tool.durability.damage;
-    const usable = Math.max(0, remain - 1);
-    if (blocks.length <= usable) return blocks;
-
-    if (usable === 0) {
-        player.onScreenDisplay.setActionBar([
-            rawtext(TAG + ' §c'),
-            t('veinminer.tip.tool_low', player),
-        ]);
-        return [];
-    }
-    return blocks.slice(0, usable);
+    const usableWear = Math.max(0, remain - 1);
+    const capacity = usableWear * BLOCKS_PER_WEAR;
+    if (blocks.length <= capacity) return blocks;
+    return blocks.slice(0, capacity);
 }

@@ -28,3 +28,9 @@ export const LEAF_MAX_COUNT = 64;
 export const DEFAULT_CUBE_SIZE = 3;
 export const CUBE_SIZE_MIN = 1;
 export const CUBE_SIZE_MAX = 7;
+
+/**
+ * 连锁每破坏多少块，扣 1 点工具耐久（4 = 打四折）。
+ * 耐久保护的截断计算也用它，保证「能挖多少」和「会扣多少」是同一套账。
+ */
+export const BLOCKS_PER_WEAR = 4;
