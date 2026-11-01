@@ -11,7 +11,7 @@
 
 import { world, Player } from '@minecraft/server';
 
-const KEY = 'vm:player_ban';
+const KEY = 'vmt_player_ban';
 
 let cache: Set<string> | null = null;
 
@@ -74,7 +74,3 @@ export function listBannedPlayers(): string[] {
     return [...table()];
 }
 
-/** 名单里有没有这个人（不要求在线） */
-export function isNameBanned(name: string): boolean {
-    return table().has(name.trim().toLowerCase());
-}

@@ -4,10 +4,10 @@
  * @minecraft/server-ui 2.x：toggle/slider 用 options 对象传默认值。
  * 注意：label 不产生 formValues，下表 IDX 只统计会产出值的控件。
  *
- * 触发: /scriptevent vm:s，或使用「连锁采集遥控器」潜行 + 使用
+ * 触发: /vm:c menu（或 /vm:c 不带参数）
  */
 
-import { Player, PlayerPermissionLevel, system } from '@minecraft/server';
+import { Player, system } from '@minecraft/server';
 import { ModalFormData } from '@minecraft/server-ui';
 import {
     getPlayerToggle, setPlayerToggle,
@@ -22,20 +22,8 @@ import {
 } from '../config';
 import {
     getWhitelist, clearWhitelist, formatWhitelist,
-} from './WhiteListManager';
+} from '../data/Whitelist';
 import { t, tf1, tagged } from '../utils/LangHelper';
-
-// ═══════════════════════════════════════
-//  OP 判断
-// ═══════════════════════════════════════
-
-function isOp(player: Player): boolean {
-    try {
-        return player.playerPermissionLevel >= PlayerPermissionLevel.Operator;
-    } catch {
-        return false;
-    }
-}
 
 // ═══════════════════════════════════════
 //  设置表单
@@ -43,8 +31,6 @@ function isOp(player: Player): boolean {
 
 export async function showSettings(player: Player): Promise<void> {
     try {
-        const op = isOp(player);
-
         const toggle = getPlayerToggle(player);
         const maxVein = getPlayerMaxVein(player);
         const maxDepth = getPlayerMaxDepth(player);
@@ -52,12 +38,8 @@ export async function showSettings(player: Player): Promise<void> {
         const outlineOn = getPlayerOutline(player);
         const wlItems = getWhitelist(player);
 
-        let collect = false;
-        let leaves = false;
-        if (op) {
-            collect = getPlayerCollectDrops(player);
-            leaves = getPlayerAutoLeaves(player);
-        }
+        const collect = getPlayerCollectDrops(player);
+        const leaves = getPlayerAutoLeaves(player);
 
         const size = getPlayerCubeSize(player);
 
@@ -111,11 +93,8 @@ export async function showSettings(player: Player): Promise<void> {
         }
 
         form.toggle(t('veinminer.ui.whitelist.clear', player), { defaultValue: false });
-
-        if (op) {
-            form.toggle(t('veinminer.ui.collect_drops_full', player), { defaultValue: collect });
-            form.toggle(t('veinminer.ui.auto_leaves_full', player), { defaultValue: leaves });
-        }
+        form.toggle(t('veinminer.ui.collect_drops_full', player), { defaultValue: collect });
+        form.toggle(t('veinminer.ui.auto_leaves_full', player), { defaultValue: leaves });
 
         const response = await form.show(player);
 
@@ -146,10 +125,8 @@ export async function showSettings(player: Player): Promise<void> {
             clearWhitelist(player);
         }
 
-        if (op) {
-            setPlayerCollectDrops(player, v[IDX.COLLECT] as boolean);
-            setPlayerAutoLeaves(player, v[IDX.AUTO_LEAVES] as boolean);
-        }
+        setPlayerCollectDrops(player, v[IDX.COLLECT] as boolean);
+        setPlayerAutoLeaves(player, v[IDX.AUTO_LEAVES] as boolean);
 
         player.sendMessage(tagged('veinminer.ui.saved', player));
     } catch (error) {

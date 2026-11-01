@@ -2,7 +2,7 @@
  * build.mjs -- VeinMinerTurbo Build Script
  *
  * Single source of truth: package.json "version" field.
- * Automatically syncs version to behavior_pack/manifest.json and resource_pack/manifest.json.
+ * Automatically syncs version to behavior_pack/manifest.json.
  *
  * Usage:
  *   node build.mjs            # bundle + package .mcaddon
@@ -23,12 +23,10 @@ import { build as esbuild, context as esbuildContext } from 'esbuild';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 const BP_DIR = path.join(ROOT, 'behavior_pack');
-const RP_DIR = path.join(ROOT, 'resource_pack');
 const ENTRY = path.join(ROOT, 'src', 'main.ts');
 const OUTPUT_DIR = path.join(ROOT, 'upload');
 const DOWNLOAD_DIR = path.join(ROOT, '..', 'download');
 const BP_MANIFEST = path.join(BP_DIR, 'manifest.json');
-const RP_MANIFEST = path.join(RP_DIR, 'manifest.json');
 
 // ═══════════════════════════════════════
 //  Version — single source of truth
@@ -60,17 +58,13 @@ function syncManifestVersion(manifestPath) {
     for (const mod of manifest.modules) {
         mod.version = VERSION_ARRAY;
     }
-    // Sync RP dependency on BP version
-    for (const dep of (manifest.dependencies || [])) {
-        if (dep.uuid) dep.version = VERSION_ARRAY;
-    }
+    // 模块依赖（@minecraft/server 等）的版本是引擎决定的，不跟着包版本走
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 4) + '\n');
 }
 
 function syncVersions() {
     syncManifestVersion(BP_MANIFEST);
-    if (fs.existsSync(RP_MANIFEST)) syncManifestVersion(RP_MANIFEST);
-    console.log(`  Synced version ${VERSION} to manifests`);
+    console.log(`  Synced version ${VERSION} to manifest`);
 }
 
 // ═══════════════════════════════════════
@@ -130,19 +124,13 @@ function packagePacks() {
     if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 
     const bpPack = path.join(OUTPUT_DIR, `VeinMinerTurbo-BP-${VERSION}.mcpack`);
-    const rpPack = path.join(OUTPUT_DIR, `VeinMinerTurbo-RP-${VERSION}.mcpack`);
     const mcaddon = path.join(OUTPUT_DIR, `VeinMinerTurbo-${VERSION}.mcaddon`);
 
     console.log('  Packaging BP...');
     zipPack(BP_DIR, bpPack);
 
-    // 资源包是可选的：本项目只发行为包，翻译内嵌在脚本里
+    // 只发行为包：翻译和中文名都内嵌在脚本里，不需要资源包
     const files = [path.basename(bpPack)];
-    if (fs.existsSync(RP_DIR)) {
-        console.log('  Packaging RP...');
-        zipPack(RP_DIR, rpPack);
-        files.push(path.basename(rpPack));
-    }
 
     console.log('  Creating .mcaddon...');
     if (fs.existsSync(mcaddon)) fs.unlinkSync(mcaddon);

@@ -28,10 +28,10 @@ import {
     getPlayerMaxDepth, getPlayerDurabilityGuard, getPlayerCubeSize,
     SCAN_TIMEOUT_MS, BLOCKS_PER_WEAR,
 } from '../config';
-import { getWhitelist } from '../ui/WhiteListManager';
-import { isPlayerBanned } from '../config/PlayerBlacklist';
+import { getWhitelist } from '../data/Whitelist';
+import { isPlayerBanned } from '../config/admin/PlayerBlacklist';
 import { getHeldTool } from '../utils/ToolHelper';
-import { t, tf1, rawtext, TAG } from '../utils/LangHelper';
+import { t, tf1, TAG } from '../utils/LangHelper';
 
 // 被限制玩家的提示节流（玩家 id → 上次提示 tick）
 const banNoticeAt = new Map<string, number>();
@@ -134,10 +134,9 @@ function handleBreak(
             );
 
             if (result.timedOut) {
-                player.onScreenDisplay.setActionBar([
-                    rawtext(TAG + ' §e'),
-                    tf1('veinminer.tip.scan_timeout_full', String(result.blocks.length), player),
-                ]);
+                player.onScreenDisplay.setActionBar(
+                    `${TAG} §e${tf1('veinminer.tip.scan_timeout_full', String(result.blocks.length), player)}`,
+                );
                 return;
             }
             blocks = result.blocks;
@@ -158,10 +157,7 @@ function handleBreak(
             if (extraBlocks.length < wanted) {
                 if (extraBlocks.length === 0) {
                     // 一点余量都没有，直接拦下
-                    player.onScreenDisplay.setActionBar([
-                        rawtext(TAG + ' §c'),
-                        t('veinminer.tip.tool_low', player),
-                    ]);
+                    player.onScreenDisplay.setActionBar(`${TAG} §c${t('veinminer.tip.tool_low', player)}`);
                     return;
                 }
                 cut = { kept: extraBlocks.length, wanted };

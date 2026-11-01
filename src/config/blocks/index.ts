@@ -5,14 +5,13 @@
 import { ORE_IDS } from './Ores';
 import { LOG_IDS } from './Logs';
 import { LEAF_IDS } from './Leaves';
-import { BLACKLIST_IDS, FORBIDDEN_IDS } from './Blacklist';
-import { isNoWideBlock, isLockedBlock } from '../GlobalBlacklist';
+import { FORBIDDEN_IDS } from './Forbidden';
+import { isNoWideBlock, isLockedBlock } from '../admin/GlobalBlacklist';
 
 // 预构建 Set，O(1) 查询
 const WHITELIST_SET = new Set<string>([...ORE_IDS, ...LOG_IDS]);
 const LOG_SET = new Set<string>(LOG_IDS);
 const LEAF_SET = new Set<string>(LEAF_IDS);
-const BLACKLIST_SET = new Set<string>(BLACKLIST_IDS);
 const FORBIDDEN_SET = new Set<string>(FORBIDDEN_IDS);
 
 /** 连锁模式 */
@@ -24,14 +23,12 @@ export type MineMode =
     /** 不给连锁 */
     | 'none';
 
-/** 是否在默认白名单内（矿石/原木） */
-export function isWhitelisted(blockId: string): boolean {
+/**
+ * 是否属于内置可连锁方块（矿石 / 原木）。
+ * 这批不需要玩家加白名单，潜行挖就直接整条连锁。
+ */
+export function isBuiltinMineable(blockId: string): boolean {
     return WHITELIST_SET.has(blockId);
-}
-
-/** 是否在默认黑名单内（草/土/石这类大片地形） */
-export function isBlacklisted(blockId: string): boolean {
-    return BLACKLIST_SET.has(blockId);
 }
 
 /** 是否绝对禁止连锁（内置的基岩/命令块 + OP 锁定的方块） */

@@ -64,35 +64,3 @@ export function getEnchantLevel(item: ItemStack, enchantId: string): number {
     }
 }
 
-// ═══════════════════════════════════════
-//  耐久消耗
-// ═══════════════════════════════════════
-
-/**
- * 消耗一次耐久，使用组件内置 getDamageChance 处理耐久附魔
- * @returns true 表示工具已损坏，应停止挖掘
- */
-export function consumeDurability(tool: ToolInfo): boolean {
-    if (!tool.item || !tool.durability) return false;
-
-    const { durability } = tool;
-    if (durability.damage >= durability.maxDurability) {
-        return true; // 已损坏
-    }
-
-    try {
-        const durComp = tool.item.getComponent(ItemComponentTypes.Durability);
-        if (!durComp) return false;
-
-        const unbreaking = getEnchantLevel(tool.item, 'unbreaking');
-        const damageChance = durComp.getDamageChance(unbreaking);
-
-        if (Math.random() < damageChance) {
-            durComp.damage += 1;
-        }
-    } catch {
-        // 组件操作失败忽略
-    }
-
-    return false;
-}

@@ -34,21 +34,13 @@ const ZH_CN: Dict = {
     'veinminer.ui.whitelist_label_empty': '白名单: （空）',
     'veinminer.ui.whitelist.clear': '清空白名单',
     'veinminer.ui.saved': '设置已保存',
-    'veinminer.tip.loaded': '已加载',
-    'veinminer.tip.sneak_mine': '潜行+挖掘',
     'veinminer.tip.on': '连锁挖矿已开启',
     'veinminer.tip.off': '连锁挖矿已关闭',
     'veinminer.tip.scan_timeout_full': '连锁扫描超时，已破坏 %s 个方块',
     'veinminer.tip.broken': '连锁破坏了 %s 个方块',
-    'veinminer.tip.added': '已添加 %s',
-    'veinminer.tip.already': '已在白名单中',
-    'veinminer.tip.not_looking': '没有注视任何方块',
     'veinminer.tip.settings_error': '设置界面打开失败，请稍后重试',
     'veinminer.tip.tool_low': '工具耐久不足，已停止连锁',
     'veinminer.tip.durability_cut': '耐久见底，只连锁了 %s/%s 块',
-    'veinminer.hud.selected': '§f%s §a已选择 §7· §e潜行挖掘确认',
-    'veinminer.hud.target': '§f%s §7× §e%s',
-    'veinminer.wl.empty': '白名单是空的，用 /vm:whitelist add 加方块',
 };
 
 const ZH_TW: Dict = {
@@ -70,21 +62,13 @@ const ZH_TW: Dict = {
     'veinminer.ui.whitelist_label_empty': '白名單: （空）',
     'veinminer.ui.whitelist.clear': '清空白名單',
     'veinminer.ui.saved': '設定已儲存',
-    'veinminer.tip.loaded': '已載入',
-    'veinminer.tip.sneak_mine': '潛行+挖掘',
     'veinminer.tip.on': '連鎖挖礦已開啟',
     'veinminer.tip.off': '連鎖挖礦已關閉',
     'veinminer.tip.scan_timeout_full': '連鎖掃描逾時，已破壞 %s 個方塊',
     'veinminer.tip.broken': '連鎖破壞了 %s 個方塊',
-    'veinminer.tip.added': '已添加 %s',
-    'veinminer.tip.already': '已在白名單中',
-    'veinminer.tip.not_looking': '沒有注視任何方塊',
     'veinminer.tip.settings_error': '設定介面開啟失敗，請稍後重試',
     'veinminer.tip.tool_low': '工具耐久不足，已停止連鎖',
     'veinminer.tip.durability_cut': '耐久見底，只連鎖了 %s/%s 塊',
-    'veinminer.hud.selected': '§f%s §a已選擇 §7· §e潛行挖掘確認',
-    'veinminer.hud.target': '§f%s §7× §e%s',
-    'veinminer.wl.empty': '白名單是空的，用 /vm:whitelist add 加方塊',
 };
 
 const EN_US: Dict = {
@@ -106,21 +90,13 @@ const EN_US: Dict = {
     'veinminer.ui.whitelist_label_empty': 'Whitelist: (empty)',
     'veinminer.ui.whitelist.clear': 'Clear whitelist',
     'veinminer.ui.saved': 'Settings saved',
-    'veinminer.tip.loaded': 'Loaded',
-    'veinminer.tip.sneak_mine': 'Sneak+Mine',
     'veinminer.tip.on': 'Vein mining enabled',
     'veinminer.tip.off': 'Vein mining disabled',
     'veinminer.tip.scan_timeout_full': 'Scan timed out, broke %s blocks',
     'veinminer.tip.broken': 'Chain-broke %s blocks',
-    'veinminer.tip.added': 'Added %s',
-    'veinminer.tip.already': 'already in whitelist',
-    'veinminer.tip.not_looking': 'Not looking at any block',
     'veinminer.tip.settings_error': 'Failed to open settings, please try again later',
     'veinminer.tip.tool_low': 'Tool durability too low, chain stopped',
     'veinminer.tip.durability_cut': 'Out of durability: chained %s of %s blocks',
-    'veinminer.hud.selected': '§f%s §aselected §7· §esneak + mine to confirm',
-    'veinminer.hud.target': '§f%s §7× §e%s',
-    'veinminer.wl.empty': 'Whitelist is empty, use /vm:whitelist add',
 };
 
 
@@ -161,11 +137,6 @@ export function tf2(key: string, a1: string, a2: string, player?: Player): strin
     return t(key, player).replace('%s', a1).replace('%s', a2);
 }
 
-/** 带前缀 + 一个参数 */
-export function taggedf1(key: string, arg: string, player?: Player): string {
-    return `${TAG} ${tf1(key, arg, player)}`;
-}
-
 /** 带前缀的提示文本 */
 export function tagged(key: string, player?: Player): string {
     return `${TAG} ${t(key, player)}`;
@@ -173,9 +144,4 @@ export function tagged(key: string, player?: Player): string {
 
 /** 前缀 TAG */
 export const TAG = '§8[VMT]§r';
-
-/** 兼容旧调用：原样返回文本（不再是 RawMessage） */
-export function rawtext(text: string): string {
-    return text;
-}
 

@@ -1,13 +1,14 @@
 /**
- * WhiteListManager.ts -- 玩家自定义白名单
+ * Whitelist.ts — 玩家个人白名单（每个玩家自己维护）
  *
- * DynamicProperty 键名前缀 veinminer_
+ * 存玩家动态属性，JSON 数组，上限 64 种方块。
+ * 只存 typeId，显示时经 BlockNames 转中文。
  */
 
 import { Player } from '@minecraft/server';
-import { blockName } from '../utils/BlockNames';
+import { blockName } from './BlockNames';
 
-const WHITELIST_KEY = 'veinminer_whitelist';
+const WHITELIST_KEY = 'vmt_whitelist';
 const MAX_SIZE = 64;
 
 // ═══════════════════════════════════════
@@ -34,14 +35,19 @@ function setWhitelist(player: Player, list: string[]): void {
 //  增删清
 // ═══════════════════════════════════════
 
-export function addToWhitelist(player: Player, blockTypeId: string): boolean {
+export type AddResult = 'added' | 'exists' | 'full';
+
+export function addToWhitelist(player: Player, blockTypeId: string): AddResult {
     const list = getWhitelist(player);
-    if (list.includes(blockTypeId)) return false;
-    if (list.length >= MAX_SIZE) return false;
+    if (list.includes(blockTypeId)) return 'exists';
+    if (list.length >= MAX_SIZE) return 'full';
     list.push(blockTypeId);
     setWhitelist(player, list);
-    return true;
+    return 'added';
 }
+
+/** 白名单条数上限 */
+export const WHITELIST_LIMIT = MAX_SIZE;
 
 export function removeFromWhitelist(player: Player, blockTypeId: string): boolean {
     const list = getWhitelist(player);

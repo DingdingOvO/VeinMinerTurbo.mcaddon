@@ -1,22 +1,25 @@
 /**
- * config/index.ts — 配置模块统一导出
+ * config/index.ts — 配置层统一出口
+ *
+ * 对外只暴露「查询 / 读写」能力，具体数据表放在 blocks/ 与 admin/ 里。
  */
+
 export {
-    isWhitelisted, isBlacklisted, isLogType, isForbidden, isBuiltinForbidden,
+    isBuiltinMineable, isLogType, isForbidden, isBuiltinForbidden,
     getLeafIdSet, getMineMode,
 } from './blocks';
 export type { MineMode } from './blocks';
 export type { CubeSize } from './PlayerConfig';
-export { ORE_IDS } from './blocks/Ores';
-export { LOG_IDS } from './blocks/Logs';
-export { LEAF_IDS } from './blocks/Leaves';
-export { BLACKLIST_IDS, FORBIDDEN_IDS } from './blocks/Blacklist';
+
+export { FORBIDDEN_IDS } from './blocks/Forbidden';
+
 export {
-    DEFAULT_MAX_VEIN, HARD_MAX_VEIN, SLIDER_MIN, SLIDER_MAX,
+    DEFAULT_MAX_VEIN, HARD_MAX_VEIN,
     SCAN_TIMEOUT_MS, LEAF_SCAN_RADIUS, LEAF_MAX_COUNT,
     DEFAULT_CUBE_SIZE, CUBE_SIZE_MIN, CUBE_SIZE_MAX,
     BLOCKS_PER_WEAR,
 } from './Constants';
+
 export {
     getPlayerToggle, setPlayerToggle,
     getPlayerMaxVein, setPlayerMaxVein,
@@ -25,6 +28,5 @@ export {
     getPlayerMaxDepth, setPlayerMaxDepth,
     getPlayerDurabilityGuard, setPlayerDurabilityGuard,
     getPlayerOutline, setPlayerOutline,
-    getPlayerExcavate, setPlayerExcavate,
     getPlayerCubeSize, setPlayerCubeSize,
 } from './PlayerConfig';

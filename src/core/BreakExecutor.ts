@@ -13,7 +13,7 @@
 import { world, system, Player, Dimension, Vector3, Entity, EquipmentSlot } from '@minecraft/server';
 import { Pos, sortByDistance } from './Scanner';
 import { getDrops, getExperience, spawnDrops } from '../utils/EnchantmentHelper';
-import { tf1, tf2, rawtext, TAG } from '../utils/LangHelper';
+import { tf1, tf2, TAG } from '../utils/LangHelper';
 import { BLOCKS_PER_WEAR } from '../config/Constants';
 
 const BATCH_SIZE = 20;
@@ -162,17 +162,10 @@ function finishPlayer(pid: string, state: QueueState | undefined): void {
 
         wearTool(player, state.broken);
 
-        player.onScreenDisplay.setActionBar(
-            state.cut
-                ? [
-                    rawtext(TAG + ' §c'),
-                    tf2('veinminer.tip.durability_cut', String(state.cut.kept), String(state.cut.wanted), player),
-                ]
-                : [
-                    rawtext(TAG + ' §a'),
-                    tf1('veinminer.tip.broken', String(state.broken), player),
-                ],
-        );
+        const text = state.cut
+            ? `${TAG} §c${tf2('veinminer.tip.durability_cut', String(state.cut.kept), String(state.cut.wanted), player)}`
+            : `${TAG} §a${tf1('veinminer.tip.broken', String(state.broken), player)}`;
+        player.onScreenDisplay.setActionBar(text);
 
         if (state.collectDrops && state.droppedItems.length > 0) {
             collectDropsToOrigin(state.origin, state.droppedItems);

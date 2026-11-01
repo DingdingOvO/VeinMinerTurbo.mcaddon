@@ -8,10 +8,6 @@ export const DEFAULT_MAX_VEIN = 64;
 /** 单次连锁的服务器硬上限（玩家设置不能超过它） */
 export const HARD_MAX_VEIN = 256;
 
-/** 设置表单 slider 范围 */
-export const SLIDER_MIN = 1;
-export const SLIDER_MAX = HARD_MAX_VEIN;
-
 /** BFS 扫描超时（ms），防止卡服 */
 export const SCAN_TIMEOUT_MS = 100;
 

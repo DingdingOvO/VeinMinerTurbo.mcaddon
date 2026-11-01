@@ -11,11 +11,10 @@ import { DEFAULT_MAX_VEIN, DEFAULT_CUBE_SIZE, CUBE_SIZE_MIN, CUBE_SIZE_MAX } fro
 //  DynamicProperty key 常量
 // ═══════════════════════════════════════
 
-const KEY_TOGGLE = 'vm:toggle';
-const KEY_MAX_VEIN = 'vm:max_vein';
-const KEY_AUTO_LEAVES = 'vm:auto_leaves';
-const KEY_COLLECT_DROPS = 'vm:collect_drops';
-const KEY_EXCAVATE = 'vm:excavate';
+const KEY_TOGGLE = 'vmt_toggle';
+const KEY_MAX_VEIN = 'vmt_max_vein';
+const KEY_AUTO_LEAVES = 'vmt_auto_leaves';
+const KEY_COLLECT_DROPS = 'vmt_collect_drops';
 
 // ═══════════════════════════════════════
 //  连锁开关
@@ -76,7 +75,7 @@ export function setPlayerCollectDrops(p: Player, v: boolean): void {
 //  搜索深度
 // ═══════════════════════════════════════
 
-const KEY_MAX_DEPTH = 'veinminer_max_depth';
+const KEY_MAX_DEPTH = 'vmt_max_depth';
 const DEFAULT_MAX_DEPTH = 8;
 
 /** 获取最大搜索深度（BFS 层数），默认 8 */
@@ -93,7 +92,7 @@ export function setPlayerMaxDepth(p: Player, v: number): void {
 //  耐久保护
 // ═══════════════════════════════════════
 
-const KEY_DURABILITY = 'veinminer_durability';
+const KEY_DURABILITY = 'vmt_durability';
 
 /** 是否开启耐久保护，默认开启 */
 export function getPlayerDurabilityGuard(p: Player): boolean {
@@ -108,7 +107,7 @@ export function setPlayerDurabilityGuard(p: Player, v: boolean): void {
 //  轮廓预览
 // ═══════════════════════════════════════
 
-const KEY_OUTLINE = 'veinminer_outline';
+const KEY_OUTLINE = 'vmt_outline';
 
 /** 是否显示方块轮廓预览，默认开启 */
 export function getPlayerOutline(p: Player): boolean {
@@ -120,26 +119,12 @@ export function setPlayerOutline(p: Player, v: boolean): void {
 }
 
 // ═══════════════════════════════════════
-//  3×3×3 挖掘（普通方块白名单）
-// ═══════════════════════════════════════
-
-/** 获取3×3×3挖掘开关，默认关闭 */
-export function getPlayerExcavate(p: Player): boolean {
-    const v = p.getDynamicProperty(KEY_EXCAVATE);
-    return v === true;
-}
-
-export function setPlayerExcavate(p: Player, v: boolean): void {
-    p.setDynamicProperty(KEY_EXCAVATE, v);
-}
-
-// ═══════════════════════════════════════
 //  立方体尺寸（白名单普通方块，长/宽/高）
 // ═══════════════════════════════════════
 
-const KEY_SIZE_X = 'vm:size_x';
-const KEY_SIZE_Y = 'vm:size_y';
-const KEY_SIZE_Z = 'vm:size_z';
+const KEY_SIZE_X = 'vmt_size_x';
+const KEY_SIZE_Y = 'vmt_size_y';
+const KEY_SIZE_Z = 'vmt_size_z';
 
 export interface CubeSize {
     /** 长（X 轴） */

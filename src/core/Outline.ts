@@ -14,8 +14,8 @@
 
 import { world, system, Player, Dimension, Vector3 } from '@minecraft/server';
 import { bfsScan, Pos } from './Scanner';
-import { isWhitelisted, isLogType, getPlayerOutline } from '../config';
-import { getWhitelist } from '../ui/WhiteListManager';
+import { isBuiltinMineable, isLogType, getPlayerOutline } from '../config';
+import { getWhitelist } from '../data/Whitelist';
 
 /** 最多预览多少个方块 */
 const MAX_BLOCKS = 32;
@@ -68,7 +68,7 @@ function tickPlayer(player: Player): void {
     if (!hit || !hit.block) return;
 
     const typeId = hit.block.typeId;
-    if (!isWhitelisted(typeId) && !getWhitelist(player).includes(typeId)) return;
+    if (!isBuiltinMineable(typeId) && !getWhitelist(player).includes(typeId)) return;
 
     const dimension = hit.block.dimension;
     const origin: Vector3 = {

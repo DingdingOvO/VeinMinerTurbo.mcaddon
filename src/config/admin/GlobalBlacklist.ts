@@ -16,8 +16,8 @@
 
 import { world } from '@minecraft/server';
 
-const KEY_NOWIDE = 'vm:global_nowide';
-const KEY_LOCK = 'vm:global_lock';
+const KEY_NOWIDE = 'vmt_nowide';
+const KEY_LOCK = 'vmt_lock';
 
 // ═══════════════════════════════════════
 //  存取
