@@ -10,12 +10,19 @@
  *   - 掉落物集中：直接持有 Entity 引用，结束时遍历传送，零搜索开销
  */
 
-import { world, system, Player, Dimension, Vector3, Entity } from '@minecraft/server';
+import { world, system, Player, Dimension, Vector3, Entity, EquipmentSlot } from '@minecraft/server';
 import { Pos, sortByDistance } from './Scanner';
 import { getDrops, getExperience, spawnDrops } from '../utils/EnchantmentHelper';
 import { tf1, rawtext, TAG } from '../utils/LangHelper';
 
 const BATCH_SIZE = 20;
+
+/**
+ * 连锁每破坏多少块，扣 1 点工具耐久。
+ * 4 = 打四折：一次 64 块的连锁扣 16 点，铁镐能用十几轮，手感不至于太亏。
+ * 起点那块由原版扣 1 点，这里只算连锁的部分。
+ */
+const BLOCKS_PER_WEAR = 4;
 
 // ═══════════════════════════════════════
 //  类型
@@ -148,6 +155,8 @@ function finishPlayer(pid: string, state: QueueState | undefined): void {
         const player = world.getPlayers().find(p => p.id === pid);
         if (!player) return;
 
+        wearTool(player, state.broken);
+
         player.onScreenDisplay.setActionBar([
             rawtext(TAG + ' §a'),
             tf1('veinminer.tip.broken', String(state.broken), player),
@@ -158,6 +167,38 @@ function finishPlayer(pid: string, state: QueueState | undefined): void {
         }
     } catch (error) {
         console.warn(`[VMT] finish callback error: ${error}`);
+    }
+}
+
+// ═══════════════════════════════════════
+//  工具耐久
+// ═══════════════════════════════════════
+
+/**
+ * 按连锁块数扣主手工具耐久。
+ * 折算比例见 BLOCKS_PER_WEAR；最多扣到「差 1 点报废」，不会把工具连锁到碎。
+ */
+function wearTool(player: Player, brokenCount: number): void {
+    const wear = Math.floor(brokenCount / BLOCKS_PER_WEAR);
+    if (wear <= 0) return;
+
+    try {
+        const equip = player.getComponent('minecraft:equippable');
+        if (!equip) return;
+
+        const item = equip.getEquipment(EquipmentSlot.Mainhand);
+        if (!item) return;
+
+        const dur = item.getComponent('minecraft:durability');
+        if (!dur || dur.unbreakable) return;
+
+        const cap = dur.maxDurability - 1;
+        if (dur.damage >= cap) return;
+
+        dur.damage = Math.min(dur.damage + wear, cap);
+        equip.setEquipment(EquipmentSlot.Mainhand, item);
+    } catch (error) {
+        console.warn(`[VMT] wear tool error: ${error}`);
     }
 }
 
