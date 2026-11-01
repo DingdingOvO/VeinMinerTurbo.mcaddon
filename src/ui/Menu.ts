@@ -21,18 +21,20 @@ import {
     getPlayerCubeSize, setPlayerCubeSize,
     CUBE_SIZE_MIN, CUBE_SIZE_MAX,
 } from '../config';
-import { getWhitelist, clearWhitelist, formatWhitelist } from '../data/Whitelist';
-import { t, tf1, tagged } from '../utils/LangHelper';
+import { getWhitelist, clearWhitelist, removeFromWhitelist } from '../data/Whitelist';
+import { blockName } from '../data/BlockNames';
+import { blockIcon } from '../data/BlockIcons';
+import { t, tagged } from '../utils/LangHelper';
 
-/** 原版 UI 贴图 */
+/** 原版 UI 贴图（全部核对过文件存在，写错路径会显示不出图标） */
 const ICON = {
-    on: 'textures/ui/filled_star',
-    off: 'textures/ui/empty_star',
+    pickaxe: 'textures/ui/icon_iron_pickaxe',
     general: 'textures/ui/gear',
     range: 'textures/ui/icon_recipe_construction',
     behavior: 'textures/ui/icon_recipe_item',
     visual: 'textures/ui/icon_recipe_equipment',
     whitelist: 'textures/ui/icon_book_writable',
+    trash: 'textures/ui/icon_trash',
     close: 'textures/ui/check',
 };
 
@@ -61,7 +63,7 @@ export async function showMainMenu(player: Player): Promise<void> {
             `§7白名单 §f${wl} §7种`,
         ].join('\n'));
 
-    form.button(`${on ? '§a' : '§c'}连锁开关  §7${on ? '点击关闭' : '点击开启'}`, on ? ICON.on : ICON.off);
+    form.button(`${on ? '§a' : '§c'}连锁采集  §7${on ? '已开启 · 点击关闭' : '已关闭 · 点击开启'}`, ICON.pickaxe);
     form.button('§f基础设置\n§8最大连锁 · 深度 · 耐久保护', ICON.general);
     form.button('§f挖掘范围\n§8长 · 高 · 宽', ICON.range);
     form.button('§f采集行为\n§8掉落物 · 树叶', ICON.behavior);
@@ -191,23 +193,53 @@ async function showVisual(player: Player): Promise<void> {
 
 async function showWhitelistPage(player: Player): Promise<void> {
     const list = getWhitelist(player);
-    const body = list.length === 0
-        ? t('veinminer.ui.whitelist_label_empty', player)
-        : tf1('veinminer.ui.whitelist_label', formatWhitelist(list), player);
+
+    // 空列表：只留一行提示和一个返回
+    if (list.length === 0) {
+        const empty = new ActionFormData()
+            .title(t('veinminer.ui.whitelist.title', player))
+            .body('§7还没有方块\n\n§8对着方块打 §f/vm:wl a §8可以添加');
+        empty.button('§8返回', ICON.close);
+
+        const r = await empty.show(player);
+        if (!r.canceled) reopen(player, showMainMenu);
+        return;
+    }
 
     const form = new ActionFormData()
         .title(t('veinminer.ui.whitelist.title', player))
-        .body(`§7${body}\n\n§8对着方块打 §f/vm:wl a §8可以添加`);
+        .body(`§7共 §f${list.length} §7种方块\n§8点一下方块后面的 §c✕ §8即可移除`);
 
-    form.button('§c清空白名单', ICON.whitelist);
+    // 每种方块一行：左边物品图标，右边 ✕
+    for (const id of list) {
+        const label = `§f${blockName(id)}   §c✕`;
+        const icon = blockIcon(id);
+        if (icon) form.button(label, icon);
+        else form.button(label);
+    }
+    form.button('§c清空全部', ICON.trash);
     form.button('§8返回', ICON.close);
 
     const res = await form.show(player);
     if (res.canceled || res.selection === undefined) return;
 
-    if (res.selection === 0) {
+    const sel = res.selection;
+
+    // 点方块行 → 移除该方块
+    if (sel < list.length) {
+        removeFromWhitelist(player, list[sel]);
+        player.sendMessage(`§8[§bVMT§8] §7已移除 §f${blockName(list[sel])}`);
+        reopen(player, showWhitelistPage);
+        return;
+    }
+
+    // 清空全部
+    if (sel === list.length) {
         clearWhitelist(player);
         player.sendMessage(tagged('veinminer.ui.whitelist_cleared', player));
+        reopen(player, showWhitelistPage);
+        return;
     }
+
     reopen(player, showMainMenu);
 }
