@@ -17,6 +17,14 @@ type Dict = Record<string, string>;
 
 const ZH_CN: Dict = {
     'veinminer.ui.title': 'VeinMinerTurbo 设置',
+    'veinminer.ui.menu.title': '连锁采集',
+    'veinminer.ui.general.title': '基础设置',
+    'veinminer.ui.range.title': '挖掘范围',
+    'veinminer.ui.behavior.title': '采集行为',
+    'veinminer.ui.visual.title': '显示与特效',
+    'veinminer.ui.whitelist.title': '白名单',
+    'veinminer.ui.back': '保存并返回',
+    'veinminer.ui.whitelist_cleared': '白名单已清空',
     'veinminer.ui.toggle': '连锁挖矿',
     'veinminer.ui.max_vein': '最大连锁数',
     'veinminer.ui.size_x': '长',
@@ -45,6 +53,14 @@ const ZH_CN: Dict = {
 
 const ZH_TW: Dict = {
     'veinminer.ui.title': 'VeinMinerTurbo 設定',
+    'veinminer.ui.menu.title': '連鎖採集',
+    'veinminer.ui.general.title': '基礎設定',
+    'veinminer.ui.range.title': '挖掘範圍',
+    'veinminer.ui.behavior.title': '採集行為',
+    'veinminer.ui.visual.title': '顯示與特效',
+    'veinminer.ui.whitelist.title': '白名單',
+    'veinminer.ui.back': '儲存並返回',
+    'veinminer.ui.whitelist_cleared': '白名單已清空',
     'veinminer.ui.toggle': '連鎖挖礦',
     'veinminer.ui.max_vein': '最大連鎖數',
     'veinminer.ui.size_x': '長',
@@ -73,6 +89,14 @@ const ZH_TW: Dict = {
 
 const EN_US: Dict = {
     'veinminer.ui.title': 'VeinMinerTurbo Settings',
+    'veinminer.ui.menu.title': 'Vein Mining',
+    'veinminer.ui.general.title': 'General',
+    'veinminer.ui.range.title': 'Mining Range',
+    'veinminer.ui.behavior.title': 'Collection',
+    'veinminer.ui.visual.title': 'Visuals',
+    'veinminer.ui.whitelist.title': 'Whitelist',
+    'veinminer.ui.back': 'Save & Back',
+    'veinminer.ui.whitelist_cleared': 'Whitelist cleared',
     'veinminer.ui.toggle': 'Vein Mining',
     'veinminer.ui.max_vein': 'Max Range',
     'veinminer.ui.size_x': 'Length',

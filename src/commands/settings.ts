@@ -8,7 +8,7 @@
 
 import { Player } from '@minecraft/server';
 import { getPlayerToggle, setPlayerToggle, getPlayerOutline, setPlayerOutline } from '../config';
-import { showSettings } from '../ui/VeinMinerUI';
+import { showMainMenu } from '../ui/Menu';
 import { t } from '../utils/LangHelper';
 import { bar } from './shared';
 
@@ -30,7 +30,7 @@ export function runSettings(player: Player, args: string[]): void {
     }
 
     if (sub === 'menu' || sub === 'm' || sub === '') {
-        void showSettings(player);
+        void showMainMenu(player);
         return;
     }
 
