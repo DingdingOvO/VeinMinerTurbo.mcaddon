@@ -23,11 +23,11 @@ import { runAction, ModuleId } from './index';
 
 /** 补全用的枚举。名字必须带命名空间 */
 const ENUMS: Record<string, string[]> = {
-    'vmt:help_mod': ['wl', 'c', 'ad'],
-    'vmt:wl_act': ['add', 'a', 'remove', 'r', 'list', 'l', 'clear', 'c'],
-    'vmt:cfg_act': ['toggle', 't', 'outline', 'o', 'menu', 'm'],
-    'vmt:ad_grp': ['bl', 'lk', 'pb'],
-    'vmt:ad_act': ['add', 'a', 'remove', 'r', 'list', 'l', 'builtin', 'bi'],
+    'vm:help_mod': ['wl', 'c', 'ad'],
+    'vm:wl_act': ['add', 'a', 'remove', 'r', 'list', 'l', 'clear', 'c'],
+    'vm:cfg_act': ['toggle', 't', 'outline', 'o', 'menu', 'm'],
+    'vm:ad_grp': ['bl', 'lk', 'pb'],
+    'vm:ad_act': ['add', 'a', 'remove', 'r', 'list', 'l', 'builtin', 'bi'],
 };
 
 const enumP = (name: string): CustomCommandParameter => ({ name, type: CustomCommandParamType.Enum });
@@ -44,35 +44,35 @@ interface CmdDef {
 const CMDS: CmdDef[] = [
     {
         name: 'vm:help', description: '命令列表 /vm:help [wl|c|ad]', module: 'help',
-        params: [enumP('vmt:help_mod')],
+        params: [enumP('vm:help_mod')],
     },
     {
         name: 'vm:h', description: '命令列表（同 vm:help）', module: 'help',
-        params: [enumP('vmt:help_mod')],
+        params: [enumP('vm:help_mod')],
     },
     {
         name: 'vm:wl', description: '白名单 add/remove/list/clear', module: 'wl',
-        params: [enumP('vmt:wl_act'), strP('block')],
+        params: [enumP('vm:wl_act'), strP('block')],
     },
     {
         name: 'vm:whitelist', description: '白名单（同 vm:wl）', module: 'wl',
-        params: [enumP('vmt:wl_act'), strP('block')],
+        params: [enumP('vm:wl_act'), strP('block')],
     },
     {
         name: 'vm:c', description: '设置 toggle/outline/menu', module: 'cfg',
-        params: [enumP('vmt:cfg_act')],
+        params: [enumP('vm:cfg_act')],
     },
     {
         name: 'vm:cfg', description: '设置（同 vm:c）', module: 'cfg',
-        params: [enumP('vmt:cfg_act')],
+        params: [enumP('vm:cfg_act')],
     },
     {
         name: 'vm:ad', description: '管理命令（仅 OP）', module: 'ad',
-        params: [enumP('vmt:ad_grp'), enumP('vmt:ad_act'), strP('target')],
+        params: [enumP('vm:ad_grp'), enumP('vm:ad_act'), strP('target')],
     },
     {
         name: 'vm:admin', description: '管理命令（同 vm:ad）', module: 'ad',
-        params: [enumP('vmt:ad_grp'), enumP('vmt:ad_act'), strP('target')],
+        params: [enumP('vm:ad_grp'), enumP('vm:ad_act'), strP('target')],
     },
 ];
 
